@@ -23,6 +23,7 @@ using namespace std;
 
 //very beginning setup,set up some global variables
 const double PI=atan(1.0)*4;//
+string parameters = "parameter.txt";
 double my_tolerance=1e-4;   //currently the arccuarrcy of the integrator is not very good
 
 //these are model parameters
@@ -40,10 +41,18 @@ double lambdav=0.030;
 double lambda=0.023762;
 double ks=0.0600;
 double ka=1.420333/hbarc;
+
+
+
+//double ms, mv, mp, mg, gs, gv, gp, gg, lambdas, lambdav, lambda, ks, ka;
+
+
+
+
 //----------------------------------------------------
 
 double b=2.4,rmin=0.0,rmax=20.0;         
-int N=501;
+int N=801;
 int max_L=1;                                //might need to change
 double h=(rmax-rmin)/(N-1);
 int proton_number=20;
@@ -56,8 +65,41 @@ unordered_map<string, double> Energy_map;
 unordered_map<string, double > Angular_map;
 
 
-//construct three unordered map: States, energy and Angular
+/*construct three unordered map: States, energy and Angular
+            and  get global data */
 void preprocessing(){
+
+
+/* get the input parameters */
+    ifstream parameter_file;
+    parameter_file.open(parameters);
+    parameter_file >> ms;         
+    parameter_file >> mv;         
+    parameter_file >> mp;         
+    parameter_file >> mg;         
+    parameter_file >> gs;
+    parameter_file >> gv;
+    parameter_file >> gp;
+    parameter_file >> gg;
+    parameter_file >> lambdas;
+    parameter_file >> lambdav;
+    parameter_file >> lambda;
+    parameter_file >> ks;
+    parameter_file >> ka;   
+/*--------------------------------------------- */
+
+
+    cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
+    cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
+    cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl; 
+      
+    ms /= hbarc;
+    mv /= hbarc;
+    mp /= hbarc;
+    mg /= hbarc;
+    ka /= hbarc;
+
+
     vector<vector<double>> wave_function;  //store the upper_part and lower part
     vector<double> energy;                 //stor all the energys
     for(int i=0;i<N;i++)
@@ -198,14 +240,14 @@ void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &oc
     //filter the solution,only accept that are physical
     for(int i=0;i<occp_raw.size();i++){
         occp_raw[i].solution.eigen_values=occp_raw[i].solution.eigen_values*hbarc-939;
-        if ((occp_raw[i].solution.eigen_values<0) && (occp_raw[i].solution.eigen_values>-939)){
+        if ((occp_raw[i].solution.eigen_values<5) && (occp_raw[i].solution.eigen_values>-939)){
             occp.push_back(occp_raw[i]);
         }
         
     }
     for(int i=0;i<occn_raw.size();i++){
         occn_raw[i].solution.eigen_values=occn_raw[i].solution.eigen_values*hbarc-939;
-        if ((occn_raw[i].solution.eigen_values<0) && (occn_raw[i].solution.eigen_values>-939)){
+        if ((occn_raw[i].solution.eigen_values<5) && (occn_raw[i].solution.eigen_values>-939)){
             occn.push_back(occn_raw[i]);
         }
     }
@@ -291,6 +333,7 @@ int main(){
     vector<Solution> Final_occp,Final_occn;
     
     for(int ite=0;ite<50;ite++){
+        //cout << "123" << endl;
         occp_raw.clear();
         occn_raw.clear();
         occp.clear();
@@ -303,6 +346,7 @@ int main(){
             States_m=generate_statesm(m, max_L);
             M=generate_full_matrix(scalar_n, vector_n, States_m, m);  //get the matrix for the specific m,neutron
             if (M.size()!=States_m.size()) cout<<"error!!"<<endl;   //try to be safe
+            //cout << M.size() << endl;
             flat=flat_matrix(M);
             diag=matrix_diag(flat,int(States_m.size()));    //diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix
             diag.get_results();       //diag.results is a matrix full of eigvalues and eigenvectors.
@@ -323,8 +367,7 @@ int main(){
         Final_occn=get_solutions_object(occn);
         Final_occp=get_solutions_object(occp);
         //next step: test whether it reproduce the right wave functions
-        //for(int i=0;i<occp.size();i++) cout<<Final_occp[i].energy<<' '<<Final_occp[i].m<<endl;
-        //for(int i=0;i<occn.size();i++) cout<<Final_occn[i].energy<<' '<<Final_occn[i].m<<endl;
+
         //structure of my next part
         //vector<Solution> solution = get_solutions_object(occp);
         
@@ -382,6 +425,14 @@ int main(){
 //        return 0;
 
     }
+
+    /* output the single particle energy */
+    cout << "proton_energy" << endl;
+    for(int i=0;i<occp.size();i++) cout<<Final_occp[i].energy<<' '<<Final_occp[i].m<<endl;
+    cout << "neutron_energy" << endl; 
+    for(int i=0;i<occn.size();i++) cout<<Final_occn[i].energy<<' '<<Final_occn[i].m<<endl;
+    /* ----------------------------------- */
+
     chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
     chrono::steady_clock::duration d = tp2-tp1;
     cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;

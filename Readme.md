@@ -178,7 +178,30 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
 ```
 
 
+## partial result:
+
+
+
+
 # Next step
+
+```
+| Model | Nucleus  |  C++  | Python |
+|-------|----------|-------|--------|
+|Garnet |PB208     |7.880  | 7.890  |
+|Garnet |Ca48      |8.606  | 8.614  |
+|Garnet |Ca40      |8.522  | 8.529  |
+|Garnet |Sn132     |8.351  | 8.359  |
+|Gold   |PB208     |7.879  | 7.888  |
+|Gold   |Ca48      |8.583  | 8.585  |
+|Gold   |Ca40      |8.536  | 8.538  |
+|Gold   |Sn132     |8.336  | 8.338  |
+|NL3    |PB208     |7.872  | 7.876  |
+|NL3    |Ca48      |8.637  | 8.640  |
+|NL3    |Ca40      |8.538  | 8.540  |
+|NL3    |Sn132     |8.359  | 8.361  |
+```
+
 
 #### Let the function read the parameters
 #### add threads
