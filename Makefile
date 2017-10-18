@@ -4,5 +4,8 @@ main: main.o RacahFunctions.o
 main.o:
 	g++ -c -std=c++11 main.cpp -O3
 
+RacahFunctions.o:
+	gfortran RacahFunctions.f -c
+
 clean:
-	rm main.o main
+	rm *.o main
