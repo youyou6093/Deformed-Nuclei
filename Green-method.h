@@ -5,7 +5,7 @@
 //  Created by Junjie Yang on 7/17/17.
 //  Copyright © 2017 Junjie Yang. All rights reserved.
 
-//need to verify
+
 #ifndef Green_method_h
 #define Green_method_h
 #include "integrator.h"

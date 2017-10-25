@@ -309,7 +309,13 @@ int main(){
     
     /*------------------------------------------------------body of my program*/
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
-    for(int ite=0;ite<50;ite++){
+    
+    
+    
+    for(int ite=0;ite<2;ite++){
+        
+        chrono::steady_clock::time_point tpold = chrono::steady_clock::now();
+        
         occp_raw.clear();
         occn_raw.clear();
         occp.clear();
@@ -339,21 +345,14 @@ int main(){
         /*----------------------------------*/
         generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron
         generate_potential(Phi, W, B, A, Potential, scalar_p, vector_p, Potential_channel, 1);   //proton
+        
+        /* solve the dirac equation for one iteration */
         for(double m = min_m ; m < max_m + 1 ; m++){
             States_m=generate_statesm(m, max_L);
             generate_full_matrix(scalar_n, vector_n, States_m, m);
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);  //get the matrix for the specific m,neutron
             if (M.size()!=States_m.size()) cout<<"error!!"<<endl;   //try to be safe
             /*another test */
-//            ofstream infile;
-//            infile.open("test_matrix.txt");
-//            cout << M.size() << endl;
-////            cout << M[
-//            for(int i =0 ; i < M.size(); i++)
-//                for( int j =0; j < M.size(); j++ )
-//                    infile << M[i][j] <<endl;
-//
-//            break;
             flat=flat_matrix(M);
             diag=matrix_diag(flat,int(States_m.size()));    //diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix
             diag.get_results();                             //diag.results is a matrix full of eigvalues and eigenvectors.
@@ -367,43 +366,17 @@ int main(){
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
         }
         
-        //break;
         get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state
         Final_occn=get_solutions_object(occn);                   //get solution object
         Final_occp=get_solutions_object(occp);
-        
-//        /*test*/
-//        Solution test = Final_occp[0];
-//        test.get_primary_state();
-//        cout << test.energy << ' ' << test.m << ' ' << test.primary_state << endl;
-//        test.get_all_wavefunction();
-//        for( int i =0; i < test.my_pair.size(); i++)
-//            cout << test.my_pair[i].coefs << ' ' << test.my_pair[i].state << endl;
-//        for( int i = 0; i < test.wavefunctions.size(); i++){
-//            ofstream infile;
-//            infile.open(to_string(test.wavefunctions[i].kappa) + "wavefunctionc.txt");
-//            for( int x = 0 ; x < N; x++){
-//                infile << fx[x] << ' ' << test.wavefunctions[i].upper[x] << ' ' << test.wavefunctions[i].lower[x] << endl;
-//            }
-//            infile.close();
-//        }
-////        for(int i = 0; i < N; i++){
-////            cout << scalar_n[0][i] << ' ' << vector_n[0][i] << ' ' << scalar_p[0][i] << ' ' << vector_p[0][i] << endl;
-////        }
-//        break;
-//
-        /* check the density */
+    
         generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states
-        cout << "test\n" ;
-        cout<<"ite="<<ite<<endl;
+        
         for(int i = 0; i < max_L; i++)
             cout << "channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
-        /* compute the effective density */
+        /* compute the effective density
+         solve the klein-gordon equation */
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
-        
-        /* out put the potential after every iteration*/
-//        for(int i = 0; i < max_L; i++)
-//            cout << "channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
         for(int i = 0; i < max_L; i++)
             cout <<"channel="<<i<<':'<< Phi[i][0] <<' '<< W[i][0]<<' '<<B[i][0]<<' '<<A[i][0]<<endl;
         /*check how many occ states we found for each iteration*/
@@ -411,9 +384,13 @@ int main(){
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
         
+        chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
+        chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
+        cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
     } //end the iterations
-    /* get time */
     
+    /* option part ,
+     out put data */
     for(int i = 0 ;i < max_L; i++){
         ofstream outfile;
         ofstream outfile2;
@@ -427,10 +404,28 @@ int main(){
         outfile2.close();
     }
     
+    /* get time */
     chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
     chrono::steady_clock::duration d = tp2-tp1;
     cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* output potential */
 //ofstream myfile;
@@ -453,3 +448,25 @@ int main(){
 //cout << "neutron_energy" << endl;
 //for(int i=0;i<occn.size();i++) cout<<Final_occn[i].energy<<' '<<Final_occn[i].m<<endl;
 /* ----------------------------------- */
+
+
+//        /*test*/
+//        Solution test = Final_occp[0];
+//        test.get_primary_state();
+//        cout << test.energy << ' ' << test.m << ' ' << test.primary_state << endl;
+//        test.get_all_wavefunction();
+//        for( int i =0; i < test.my_pair.size(); i++)
+//            cout << test.my_pair[i].coefs << ' ' << test.my_pair[i].state << endl;
+//        for( int i = 0; i < test.wavefunctions.size(); i++){
+//            ofstream infile;
+//            infile.open(to_string(test.wavefunctions[i].kappa) + "wavefunctionc.txt");
+//            for( int x = 0 ; x < N; x++){
+//                infile << fx[x] << ' ' << test.wavefunctions[i].upper[x] << ' ' << test.wavefunctions[i].lower[x] << endl;
+//            }
+//            infile.close();
+//        }
+////        for(int i = 0; i < N; i++){
+////            cout << scalar_n[0][i] << ' ' << vector_n[0][i] << ' ' << scalar_p[0][i] << ' ' << vector_p[0][i] << endl;
+////        }
+//        break;
+//

@@ -22,7 +22,6 @@ vector<State> generate_statesk(int nodes,int k,double m){
     }
     my_state=positive;
     my_state.insert(my_state.end(),negative.begin(),negative.end());
-    //cout<<k<<' '<<my_state.size()<<endl;
     return my_state;
 
     
