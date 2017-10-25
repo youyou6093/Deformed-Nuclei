@@ -200,7 +200,18 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
 |NL3    |Ca48      |8.640  | 8.640  |
 |NL3    |Ca40      |8.541  | 8.540  |
 |NL3    |Sn132     |8.363  | 8.361  |
+|Linear |Ca48      |6.712  | 6.712  |
 ```
+
+
+## Oct 17
+My function can now read the parameters from the a txt file.
+
+## Oct 18
+First 50 iterations run the self-consisitent calculations. Then at iteration 51 I add deformation potential
+
+## Oct 19
+Try linear parameters
 
 
 #### Let the function read the parameters

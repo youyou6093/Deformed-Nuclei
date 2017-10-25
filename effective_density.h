@@ -6,8 +6,7 @@
 //  Copyright © 2017 Junjie Yang. All rights reserved.
 //
 
-//need to found a way to calculate the C-G coefficients
-//need to test this
+
 #ifndef effective_density_h
 #define effective_density_h
 #include "Green-method.h"
@@ -28,12 +27,6 @@ extern vector<double> empty;
 extern double lambdas,lambdav,lambda,ka,ks,ms,mv,mp,mg,gs,gv,gp,gg;
 
 
-
-
-//need to verify
-//double tj_(double *a1,double *a2,double *a3,double *b1,double *b2,double *b3){
-//    return 1.0;
-//}
 
 double pcg_(double j1,double j2,double j3){            //compute the parity cg coefficients based on the three-symbol
     double m1=0;
@@ -88,7 +81,7 @@ vector<vector<double>> multiplication(vector<vector<double>> &vec1,vector<vector
 void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                            vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
                            vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> denp){
-    //vector<vector<double>> EFF_Phi,EFF_W,EFF_B,EFF_A;
+    
     vector<vector<double>> W2,W3,Phi2,Phi3,B2,po1,po2,po3,po4;
     W2=multiplication(W, W);
     W3=multiplication(W2, W);
@@ -131,7 +124,6 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
 }
 
 void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> denp){
-    //waiting here!
     for(int i=0;i<5;i++){        //how many iteration I want to solve klein-gordon equation
         get_effective_density(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int j=0;j<max_L;j++){

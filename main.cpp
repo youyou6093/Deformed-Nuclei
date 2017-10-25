@@ -17,6 +17,7 @@
 #include "utility.h"
 #include <algorithm>
 using namespace std;
+#define MAX_KAPPA 7
 
 /*set up global varialbes*/
 const double PI=atan(1.0)*4;
@@ -43,18 +44,20 @@ double ka=1.420333/hbarc;
 /* Computation constants */
 double b=2.4,rmin=0.0,rmax=20.0;
 int N=801;
-int max_L = 1;        //max value of L CHANNEL
+/*Max value of L CHANNEL, it is initialized to 1( nothing at all! ). However, it will change after 50(or other values) iterations */
+int max_L = 1;
+/*The potential I want to add, initialized to 0 but will change to 1(or other value) after some iterations */
 int Potential_channel = 0;
+/*After a few iterations it will also change */
 double Deformation_parameter = 0.00;
 double h=(rmax-rmin)/(N-1);       //grid size
-int proton_number=20;             //default nucleus is Ca48
-int neutron_number=28;
+int proton_number, neutron_number;
 vector<double> start ={450.0,400.0,5.0,0.0}; //initial value of Phi W B A in the wood-saxon form
 vector<double> fx;                //X value array
-vector<double> empty;             //empty vector
-unordered_map<string, vector<vector<double>> > States_map;
-unordered_map<string, double> Energy_map;
-unordered_map<string, double > Angular_map;
+vector<double> empty;             //empty vector, will be initialized later
+unordered_map<string, vector<vector<double>> > States_map;   //store the infos about the wavefunctions when given states
+unordered_map<string, double> Energy_map;                    //store the energies for every state
+unordered_map<string, double > Angular_map;                  //Stroe the value A in my notes
 
 
 /*construct three unordered map: States, energy and Angular and get global data */
@@ -93,16 +96,16 @@ void preprocessing(){
         fx.push_back(h*i+rmin);   //construct the x array for all the basis
     
     /*constructed the States hash table*/
-    vector<State>states_1 = generate_statesm(0.5,max_L);  //this is the largest basis
+    vector<State>states_1 = generate_statesm(0.5,MAX_KAPPA);  //this is the largest basis, gives me everything in the basis
     for(int i=0;i<states_1.size();i++){
         dirac_oscillator ho(states_1[i].sign,states_1[i].n,states_1[i].k,b,rmin,rmax,N);
         wave_function.clear();   //empty the array
         wave_function.push_back(ho.upper);
         wave_function.push_back(ho.lower);
-        States_map.insert(make_pair(states_1[i].key,wave_function));
+        States_map.insert(make_pair(states_1[i].key, wave_function));
         Energy_map.insert(make_pair(states_1[i].key, ho.E));
     }
-    /*construct the angular hash table*/
+    /*construct the angular hash table, basically read values from the file and store it inside unordered set*/
     vector<string> keys_1,value_1;
     string word;
     ifstream infile;
@@ -129,6 +132,7 @@ void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vect
     B.clear();
     A.clear();
     vector<double> phi,w,b,a;
+    /* wood saxon part */
     for(int i=0;i<N;i++){
         value=(exp(fx[i]-4.3)/0.7+1);
         phi.push_back(start[0]/value);
@@ -149,7 +153,7 @@ void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vect
     /*initialize all other channels to 0*/
     for(int i=0;i<N;i++)
         empty.push_back(0.0);
-    for(int i=0;i<max_L-1;i++){
+    for(int i=0;i<max_L-1;i++){         //max_L - 1 because I already assign the 0 channel
         Phi.push_back(empty);
         W.push_back(empty);
         B.push_back(empty);
@@ -248,7 +252,7 @@ void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &oc
 
 
 
-
+/* for specific m, return the solution eig2,contains m */
 vector<eig2> get_temp_solution(vector<eig> &results,double m){
     eig2 temp;
     vector<eig2> temp_solution;
@@ -272,10 +276,9 @@ int main(){
     vector<vector<double>> scalar_p,vector_p,scalar_n,vector_n;
     vector<double> Potential,flat; //flat is the flatted matrix
     vector<State> States_m;        //the basis quantum number of a specific m
-    vector<vector<double>> M;      //Matrix to be diagnolized
     matrix_diag diag = matrix_diag();      //diagnolization class
-    vector<eig2>  occp,occn; //occupied states of protons and neutrons
-    vector<eig2>  occp_raw,occn_raw;      //raw solution of matrix
+    vector<eig2> occp,occn;        //occupied states of protons and neutrons
+    vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;
     /*determine the Z and N;*/
     cout << "Z=: ";
@@ -291,6 +294,7 @@ int main(){
         denp.push_back(empty);
         den3.push_back(empty);
     }
+    /*Initially, there is no dipole potential added*/
     for(int i=0;i<N;i++)               
         Potential.push_back(0.00); 
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;   //set everything to zero;
@@ -298,27 +302,58 @@ int main(){
     double min_m = -magic(max(proton_number,neutron_number));
     double max_m = -min_m;
     cout<<min_m<<endl;
-    
     //------------------------------------
     cout<<"finishing processing"<<endl;
+   
     
-    //------------------------------------------------------body of my program
     
-    vector<Solution> Final_occp,Final_occn;
-    
+    /*------------------------------------------------------body of my program*/
+    vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
     for(int ite=0;ite<50;ite++){
         occp_raw.clear();
         occn_raw.clear();
         occp.clear();
         occn.clear();            //make sure they are empty
+        /* the newly implemented part, when
+         The iteration is bigger thant some presetted time,
+         I will add dipole potential and add more L channel*/
+        if (ite > -1){
+            max_L = 3;
+            Deformation_parameter =  0.1 ;
+            Potential_channel = 1;
+            for (int i = 1 ; i < max_L; i++){
+                Phi.push_back(empty);
+                W.push_back(empty);
+                B.push_back(empty);
+                A.push_back(empty);
+                dens.push_back(empty);
+                denv.push_back(empty);
+                denp.push_back(empty);
+                den3.push_back(empty);
+            }
+            EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;
+        }
         for(int i=0;i<N;i++)                //initialize the excitation term
-            Potential[i] = fx[i] * Deformation_parameter;                                        //might need to change
+            Potential[i] = fx[i] * Deformation_parameter;
+            //might need to change
+        /*----------------------------------*/
         generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron
         generate_potential(Phi, W, B, A, Potential, scalar_p, vector_p, Potential_channel, 1);   //proton
         for(double m = min_m ; m < max_m + 1 ; m++){
             States_m=generate_statesm(m, max_L);
-            M=generate_full_matrix(scalar_n, vector_n, States_m, m);  //get the matrix for the specific m,neutron
+            generate_full_matrix(scalar_n, vector_n, States_m, m);
+            vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);  //get the matrix for the specific m,neutron
             if (M.size()!=States_m.size()) cout<<"error!!"<<endl;   //try to be safe
+            /*another test */
+//            ofstream infile;
+//            infile.open("test_matrix.txt");
+//            cout << M.size() << endl;
+////            cout << M[
+//            for(int i =0 ; i < M.size(); i++)
+//                for( int j =0; j < M.size(); j++ )
+//                    infile << M[i][j] <<endl;
+//
+//            break;
             flat=flat_matrix(M);
             diag=matrix_diag(flat,int(States_m.size()));    //diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix
             diag.get_results();                             //diag.results is a matrix full of eigvalues and eigenvectors.
@@ -331,21 +366,71 @@ int main(){
             temp_solution=get_temp_solution(diag.results, m);
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
         }
+        
+        //break;
         get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state
         Final_occn=get_solutions_object(occn);                   //get solution object
         Final_occp=get_solutions_object(occp);
+        
+//        /*test*/
+//        Solution test = Final_occp[0];
+//        test.get_primary_state();
+//        cout << test.energy << ' ' << test.m << ' ' << test.primary_state << endl;
+//        test.get_all_wavefunction();
+//        for( int i =0; i < test.my_pair.size(); i++)
+//            cout << test.my_pair[i].coefs << ' ' << test.my_pair[i].state << endl;
+//        for( int i = 0; i < test.wavefunctions.size(); i++){
+//            ofstream infile;
+//            infile.open(to_string(test.wavefunctions[i].kappa) + "wavefunctionc.txt");
+//            for( int x = 0 ; x < N; x++){
+//                infile << fx[x] << ' ' << test.wavefunctions[i].upper[x] << ' ' << test.wavefunctions[i].lower[x] << endl;
+//            }
+//            infile.close();
+//        }
+////        for(int i = 0; i < N; i++){
+////            cout << scalar_n[0][i] << ' ' << vector_n[0][i] << ' ' << scalar_p[0][i] << ' ' << vector_p[0][i] << endl;
+////        }
+//        break;
+//
+        /* check the density */
         generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states
-        update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
+        cout << "test\n" ;
         cout<<"ite="<<ite<<endl;
+        for(int i = 0; i < max_L; i++)
+            cout << "channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+        /* compute the effective density */
+        update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
+        
         /* out put the potential after every iteration*/
-        for(int i=0;i<max_L;i++)
+//        for(int i = 0; i < max_L; i++)
+//            cout << "channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+        for(int i = 0; i < max_L; i++)
             cout <<"channel="<<i<<':'<< Phi[i][0] <<' '<< W[i][0]<<' '<<B[i][0]<<' '<<A[i][0]<<endl;
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
         
-
+    } //end the iterations
+    /* get time */
+    
+    for(int i = 0 ;i < max_L; i++){
+        ofstream outfile;
+        ofstream outfile2;
+        outfile.open("density" + to_string(i) + ".txt");
+        outfile2.open("potential" + to_string(i) + ".txt");
+        for(int j = 0; j < N; j++){
+            outfile << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+            outfile2 << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+        }
+        outfile.close();
+        outfile2.close();
+    }
+    
+    chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
+    chrono::steady_clock::duration d = tp2-tp1;
+    cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
+}
 
 /* output potential */
 //ofstream myfile;
@@ -353,8 +438,8 @@ int main(){
 //for(int i=0;i<N;i++)
 //    myfile<<fx[i]<<' '<<Phi[0][i]<<' '<<W[0][i]<<' '<<B[0][i]<<' '<<A[0][i]<<endl;
 
-        
-/* output density */ 
+
+/* output density */
 //        ofstream myfile;
 //        myfile.open("density.txt");
 //        for(int i=0;i<N;i++){
@@ -362,19 +447,9 @@ int main(){
 //        }
 //        myfile.close();
 
-    }
-    
-    /* output the single particle energy */
-    //cout << "proton_energy" << endl;
-    //for(int i=0;i<occp.size();i++) cout<<Final_occp[i].energy<<' '<<Final_occp[i].m<<endl;
-    //cout << "neutron_energy" << endl;
-    //for(int i=0;i<occn.size();i++) cout<<Final_occn[i].energy<<' '<<Final_occn[i].m<<endl;
-    /* ----------------------------------- */
-
-    /* get time */
-    chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
-    chrono::steady_clock::duration d = tp2-tp1;
-    cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
-}
-
-
+/* output the single particle energy */
+//cout << "proton_energy" << endl;
+//for(int i=0;i<occp.size();i++) cout<<Final_occp[i].energy<<' '<<Final_occp[i].m<<endl;
+//cout << "neutron_energy" << endl;
+//for(int i=0;i<occn.size();i++) cout<<Final_occn[i].energy<<' '<<Final_occn[i].m<<endl;
+/* ----------------------------------- */

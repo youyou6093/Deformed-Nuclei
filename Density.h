@@ -37,7 +37,6 @@ vector<int> get_possible_L(int k1,int k2){
 struct den{
     vector<double> s;
     vector<double> v;
-    //int channel;
 };
 
 
@@ -81,9 +80,6 @@ public:
         vector<int> kappas=x.kappas;   //all Kappa in this occ state
         int k1=x.wavefunctions[a].kappa;        // the first kappa of this state
         int k2=x.wavefunctions[b].kappa;        // the second kappa of this state
-        //cout<<"k1="<<k1<<' '<<"k2="<<k2<<endl;
-        //cout<<"pos1"<<endl;
-        //cout<<x.wavefunctions[a].upper[100]<<' '<<x.wavefunctions[a].lower[100]<<endl;
         vector<double> radial1=vector_multiple(x.wavefunctions[a].upper,x.wavefunctions[b].upper);          //f1*f1prime
         vector<double> radial2=vector_multiple(x.wavefunctions[a].lower,x.wavefunctions[b].lower);          //f2*f2prime
         for(int i=0;i<N;i++){
@@ -92,23 +88,17 @@ public:
         }
         radial1[0]=radial1[1];
         radial2[0]=radial2[1];
-        //cout<<"pos2"<<endl;
-        //cout<<radial1[100]<<' '<<radial2[100]<<endl;
         vector<int> L_group = get_possible_L(k1,k2);  //all the possible L get from this two kappa
         for (int i=0;i<L_group.size();i++){
             if(L_group[i]<max_L){                             //make sure it is within range
-                //cout<<m<<' '<<k1<<' '<<k2<<' '<<L_group[i]<<endl;
                 coef = Angular_map.find(generate_key(m, k1, k2, L_group[i]))->second;
-                
                 coef2 = sqrt((2.0*i+1)/4/PI);
-                //cout<<coef2<<endl;
                 den temp;                       //temp holder for this channel of this state
                 for(int j=0;j<N;j++){
                     temp.s.push_back((coef*(radial1[j]-radial2[j])*coef2));          //scalar
                     temp.v.push_back((coef*(radial1[j]+radial2[j])*coef2));          //vector
                 }
                 append(temp,i);
-                //cout<<temp.s[100]<<' '<<temp.v[100]<<endl;
             }
         }
        
@@ -125,51 +115,7 @@ public:
     }
     
     
-//    void compute(int num){
-//        Solution x=solution[num];    // The Solution class for 1 state
-//        den temp;                    // a temp density for 1 channel
-//        double m = x.m;              // m of this solution
-//        double coef,coef2;
-//        // coef is 3-j symbol, coef2 is just transformation between Legendre and Ylm
-//        vector<int> kappas = x.kappas;        //all the kappa in the solution
-//        int k1,k2;
-//        vector<double> radial1,radial2;
-//        vector<int> L_group;
-//        for(int i=0;i<kappas.size();i++){
-//            for(int j=0;j<kappas.size();j++){
-//                //cout<<i<<' '<<j<<endl;
-//                k1=x.wavefunctions[i].kappa;
-//                k2=x.wavefunctions[j].kappa;
-//                radial1=vector_multiple(x.wavefunctions[i].upper, x.wavefunctions[j].upper);
-//                radial2=vector_multiple(x.wavefunctions[i].lower, x.wavefunctions[j].lower);
-//                //cout<<x.wavefunctions[i].upper[100]<<' '<<x.wavefunctions[j].upper[100]<<radial1[100]<<endl;
-//                for(int k=1;k<N;k++){
-//                    radial1[k]/=pow(fx[k],2);
-//                    radial2[k]/=pow(fx[k],2);
-//                }
-//                radial1[0]=radial1[1];
-//                radial2[0]=radial2[1];
-//                
-//                L_group=get_possible_L(k1, k2);
-//                for(int ii=0;ii<L_group.size();ii++){
-//                    if (ii<max_L){
-//                        coef=Angular_map.find(generate_key(m, k1, k2, ii))->second;
-//                        //get the coef of angular term
-//                        temp.s.clear();  //clear the vector
-//                        temp.v.clear();
-//                        for(int k=0;k<N;k++){
-//                            coef2=sqrt((2.0*ii+1)/4/PI);
-//                            temp.s.push_back((coef*radial1[k]-coef*radial2[k])/coef2);
-//                            temp.v.push_back((coef*radial1[k]+coef*radial2[k])/coef2);
-//                            //add the new value of this partial density to the density
-//                            append(temp,ii);
-//                        }
-//                            
-//                    }
-//                }
-//            }
-//        }
-//    }
+
     
     void Compute_all(){
         for(int i=0;i<solution.size();i++){
@@ -219,3 +165,65 @@ void generate_density(vector<eig2> &occn, vector<eig2> &occp, vector<vector<doub
 
 
 #endif /* Density_h */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//    void compute(int num){
+//        Solution x=solution[num];    // The Solution class for 1 state
+//        den temp;                    // a temp density for 1 channel
+//        double m = x.m;              // m of this solution
+//        double coef,coef2;
+//        // coef is 3-j symbol, coef2 is just transformation between Legendre and Ylm
+//        vector<int> kappas = x.kappas;        //all the kappa in the solution
+//        int k1,k2;
+//        vector<double> radial1,radial2;
+//        vector<int> L_group;
+//        for(int i=0;i<kappas.size();i++){
+//            for(int j=0;j<kappas.size();j++){
+//                //cout<<i<<' '<<j<<endl;
+//                k1=x.wavefunctions[i].kappa;
+//                k2=x.wavefunctions[j].kappa;
+//                radial1=vector_multiple(x.wavefunctions[i].upper, x.wavefunctions[j].upper);
+//                radial2=vector_multiple(x.wavefunctions[i].lower, x.wavefunctions[j].lower);
+//                //cout<<x.wavefunctions[i].upper[100]<<' '<<x.wavefunctions[j].upper[100]<<radial1[100]<<endl;
+//                for(int k=1;k<N;k++){
+//                    radial1[k]/=pow(fx[k],2);
+//                    radial2[k]/=pow(fx[k],2);
+//                }
+//                radial1[0]=radial1[1];
+//                radial2[0]=radial2[1];
+//
+//                L_group=get_possible_L(k1, k2);
+//                for(int ii=0;ii<L_group.size();ii++){
+//                    if (ii<max_L){
+//                        coef=Angular_map.find(generate_key(m, k1, k2, ii))->second;
+//                        //get the coef of angular term
+//                        temp.s.clear();  //clear the vector
+//                        temp.v.clear();
+//                        for(int k=0;k<N;k++){
+//                            coef2=sqrt((2.0*ii+1)/4/PI);
+//                            temp.s.push_back((coef*radial1[k]-coef*radial2[k])/coef2);
+//                            temp.v.push_back((coef*radial1[k]+coef*radial2[k])/coef2);
+//                            //add the new value of this partial density to the density
+//                            append(temp,ii);
+//                        }
+//
+//                    }
+//                }
+//            }
+//        }
+//    }

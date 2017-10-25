@@ -77,15 +77,12 @@ public:
         for(int i=0;i<states.size();i++){
             if (abs(result.solution.eigen_vectors[i])>1e-5){   //automaticlly avoid small coefs
                 //dont use this right now
+                temp.coefs=result.solution.eigen_vectors[i];
+                temp.state=states[i];
+                my_pair.push_back(temp);
+                add_kappa(states[i].k);                    //add new kappa into the collection
             }
-            temp.coefs=result.solution.eigen_vectors[i];
-            temp.state=states[i];
-            my_pair.push_back(temp);
-            add_kappa(states[i].k);                    //add new kappa into the collection
         }            //now I get the pair
-        
-        
-        
     }
     
     
@@ -93,11 +90,14 @@ public:
         vector<State> states=generate_statesm(m, max_L);
         int max=0;
         for(int i=0;i<my_pair.size();i++)
-            if (abs(my_pair[i].coefs)>abs(my_pair[max].coefs))
+            if (abs(my_pair[i].coefs)>abs(my_pair[max].coefs)){
                 max=i;
+                
+                //cout << max <<' ' << states[max] << ' ' << abs(my_pair[max].coefs) << endl;
+            }
         
         
-        primary_state=states[max];
+        primary_state=my_pair[max].state;
         
         
     }
