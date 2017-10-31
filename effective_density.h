@@ -80,7 +80,7 @@ vector<vector<double>> multiplication(vector<vector<double>> &vec1,vector<vector
 //get the effective density
 void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                            vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
-                           vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> denp){
+                           vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp){
     
     vector<vector<double>> W2,W3,Phi2,Phi3,B2,po1,po2,po3,po4;
     W2=multiplication(W, W);
@@ -106,7 +106,7 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
 
 void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                    vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
-                   vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> denp,
+                   vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp,
                    int L){
     for(int i=1;i<N;i++){
         Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein(ms,  EFF_Phi[L] , i)/3.0; //not sure whether I can just put gs outside
@@ -123,7 +123,7 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     
 }
 
-void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> denp){
+void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp){
     for(int i=0;i<5;i++){        //how many iteration I want to solve klein-gordon equation
         get_effective_density(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int j=0;j<max_L;j++){

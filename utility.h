@@ -9,10 +9,14 @@
 #ifndef utility_h
 #define utility_h
 #include "integrator.h"
+#include <algorithm>
+using namespace std;
 
 extern int proton_number;
 extern int neutron_number;
 extern double hbarc,ms,mv,mp,mg,gs,gv,gp,gg,lambdas,lambdav, lambda, ks,ka;
+
+
 double compute_energy(vector<eig2> &occp,vector<eig2> &occn,vector<vector<double>> &Phi,
                       vector<vector<double>> &W, vector<vector<double>> &B, vector<vector<double>> &A,
                       vector<vector<double>> &dens, vector<vector<double>> &denv, vector<vector<double>> &den3,
@@ -86,7 +90,62 @@ double magic(int n){
 }
 
 
+/*flat a matrix into an vector*/
+vector<double> flat_matrix(vector<vector<double>> &M){
+    vector<double> flat_matrix;
+    int size=int(M.size());
+    for(int i=0;i<size;i++)
+        for(int j=0;j<size;j++)
+            flat_matrix.push_back(M[i][j]);
+    if(flat_matrix.size()!=size*size) cout<<"error"<<endl;   //try to be safe
+    return flat_matrix;
+}
 
+
+
+
+
+/* after we get all the raw solutions, change the solution to MEV and only keep the energies between -939 and 5,
+ make sure all the energy is negative in the end*/
+void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &occp,vector<eig2> &occn){
+    for(int i=0;i<occp_raw.size();i++){
+        occp_raw[i].solution.eigen_values=occp_raw[i].solution.eigen_values*hbarc-939;
+        if ((occp_raw[i].solution.eigen_values<5) && (occp_raw[i].solution.eigen_values>-939)){
+            occp.push_back(occp_raw[i]);
+        }
+        
+    }
+    for(int i=0;i<occn_raw.size();i++){
+        occn_raw[i].solution.eigen_values=occn_raw[i].solution.eigen_values*hbarc-939;
+        if ((occn_raw[i].solution.eigen_values<5) && (occn_raw[i].solution.eigen_values>-939)){
+            occn.push_back(occn_raw[i]);
+        }
+    }
+    
+    /*sort the solutions*/
+    sort(occn.begin(),occn.end(),compare_eig2);
+    sort(occp.begin(),occp.end(),compare_eig2);
+    /*delete some solutions if I already got enough occ states*/
+    if(occn.size()>neutron_number) occn.erase(occn.begin()+neutron_number,occn.end());
+    if(occp.size()>proton_number) occp.erase(occp.begin()+proton_number,occp.end());
+    
+}
+
+
+
+
+
+/* for specific m, return the solution eig2,contains m */
+vector<eig2> get_temp_solution(vector<eig> &results,double m){
+    eig2 temp;
+    vector<eig2> temp_solution;
+    for(int i=0;i<results.size();i++){
+        temp.m=m;
+        temp.solution=results[i];
+        temp_solution.push_back(temp);
+    }
+    return temp_solution;
+}
 
 
 

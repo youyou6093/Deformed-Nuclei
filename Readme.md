@@ -1,7 +1,20 @@
 # Explanation of my functions
 
 
-## dirac_oscillator
+## preprocess.h
+```c
+
+/* prepare all the hash tables, parameters */
+void preprocessing()
+
+/*initial guess of potentials*/
+void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> & A)
+
+/*generate the scalar and vector potential given other potentials*/
+void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, vector<vector<double>> &B,vector<vector<double>> &A,vector<double> &Potential,vector<vector<double>> &scalar_p,vector<vector<double>> &vector_p,int L,int particle_type)
+```
+
+## dirac_oscillator.h
 
 ```c
 dirac_oscillator(int sign,int n,int kappa,double b,double rmin,double rmax,int N)
@@ -9,14 +22,14 @@ int E, vector<double> upper, vector<double>lower
 double M = 939.0/197.326
 ```
 
-## State
+## states.cpp
 ```c
 State(int a,int b,double c,int d):n(a),k(b),m(c),sign(d)
 int n,int k,int sign,double m
 string k
 ```
 
-## Generate_state.h
+## generate_state.h
 ```c
 vector<State> generate_statesk(int nodes,int k,double m) 
 //I choose kappa max to be 7+max_L
@@ -24,7 +37,7 @@ vector<State> generate_statesm(double m,int max_L,int nodes=10)
 ```
 
 
-## my_spline(integrate.h)
+## integrate.h
 ```c
 my_spline(vector<double> &y_vector,vector<double> &x_vector,double tol)
 my_spline(double *y_in,double *x_in,int length,double tol)
@@ -38,7 +51,35 @@ double integral() //integrate over the range of x
 double simps(vector<double> &y,vector<double> &x)  //size of the array has to be odd
 ```
 
-## matrix_diag(symm.h)
+
+## generate_matrix.h
+
+```c++
+/* give m, k1, k2, L,get an key as the input of hash table */
+string generate_key(double m,int k1,int k2,int L);
+
+struct params{
+int n1,n2,k1,k2,s1,s2;
+vector<double>g1,g2,f1,f2;
+double m,diag_energy;
+vector<vector<double>> scalar_p,vector_p;
+};   // a struct that stores the params about the position of the matrix
+
+/* compute the matrix element for 1 channel, 1 position */
+double calculate_matrix_element(struct params & my_params,int L)
+
+/* compute the matrix element for 1 position all channels */
+void generate_matrix(vector<vector<double>> &M,vector<vector<double>> &scalar_potential,vector<vector<double>> & vector_potential,vector<State> &states,double m,int i,int j)
+
+/* compute the whole matrix */
+vector<vector<double>> generate_full_matrix(vector<vector<double>> &scalar_potential,vector<vector<double>> & vector_potential,vector<State> &states,double m)
+
+```
+
+
+
+
+## symm.h
 
 ```c
 struct eig{              //a structure that stores the eigenvectors
@@ -52,6 +93,9 @@ matrix_diag(vector<double> &data,double n)
 matrix_diag(vector<vector<double>> &M,int size)
 get_results()  //doesn’t return anything
 ```
+
+
+
 
 ## Solution.h
 
@@ -71,6 +115,9 @@ struct solution_wave_function{                // a struct that stores wave funct
     vector<double>upper;
     vector<double>lower;
 };
+
+bool compare_eig2(eig2 a,eig2 b);
+
 ```
 
 ### `class Solution` (Get the wave functions from eigenvectors)
@@ -90,7 +137,7 @@ bool add_kappa(int k)         //decide whether to add new kappa into collection
 void get_primary_state()      //find the state with the biggest coefficients
 solution_wave_function get_wave_function(int kappa) //get wavefunction with respect to one kappa
 void get_all_wave_function()        //get wavefunctions with all possible kappa
-}
+
 ```
 
 
@@ -133,7 +180,11 @@ public:
 ```
 
 
-
+## Green-method.h:
+```c
+/* given density, mass, and pos, solve the klein gordon equation at that point*/
+double klein(double mass,vector<double> density,int index);
+```
 	
 
 ## effecitve_density.h:
@@ -157,6 +208,31 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
 void update_potential(...)     // a small iteration, keep compute the densities and get potential
 
 ```
+
+## utility.h:
+
+```c++
+/* compute the energy per particle */
+double compute_energy(vector<eig2> &occp,vector<eig2> &occn,vector<vector<double>> &Phi,
+vector<vector<double>> &W, vector<vector<double>> &B, vector<vector<double>> &A,
+vector<vector<double>> &dens, vector<vector<double>> &denv, vector<vector<double>> &den3,
+vector<vector<double>> &denp)
+
+/*compute the start point of m */
+double magic(int n)
+
+/*flat a 2-d matrix in 1-d , used for matrix diag*/
+vector<double> flat_matrix(vector<vector<double>> &M)
+
+/*sort all eigenvalues, git occupied states */
+void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &occp,vector<eig2> &occn)
+
+/* for specific m, return the solution eig2,contains m
+ basically combine the solution with m*/
+vector<eig2> get_temp_solution(vector<eig> &results,double m)
+
+```
+
 
 
 
@@ -212,6 +288,9 @@ First 50 iterations run the self-consisitent calculations. Then at iteration 51 
 
 ## Oct 19
 Try linear parameters
+
+## Oct 24
+complete self consistency on Linear conditions, still testing
 
 
 #### Let the function read the parameters

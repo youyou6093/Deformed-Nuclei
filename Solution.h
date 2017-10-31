@@ -6,8 +6,7 @@
 //  Copyright © 2017 Junjie Yang. All rights reserved.
 //
 
-//I need to check whether this is right
-//most of the wavefunction for L=0 channel is already checked
+
 #ifndef Solution_h
 #define Solution_h
 #include "symm.h"
@@ -18,8 +17,6 @@
 extern int max_L;
 extern int N;
 extern unordered_map<string, vector<vector<double>> > States_map;
-//extern unordered_map<string, double> Energy_map;
-//extern unordered_map<string, double > Angular_map;
 using std::vector;
 using namespace std;
 
@@ -27,6 +24,13 @@ struct eig2{
     eig solution;
     double m;
 };
+
+/*compare function for eig2 struct*/
+bool compare_eig2(eig2 a,eig2 b){
+    return (a.solution.eigen_values<b.solution.eigen_values);
+}
+
+
 
 
 
@@ -77,11 +81,13 @@ public:
         for(int i=0;i<states.size();i++){
             if (abs(result.solution.eigen_vectors[i])>1e-5){   //automaticlly avoid small coefs
                 //dont use this right now
-                temp.coefs=result.solution.eigen_vectors[i];
-                temp.state=states[i];
-                my_pair.push_back(temp);
-                add_kappa(states[i].k);                    //add new kappa into the collection
+                
             }
+            //take all the states
+            temp.coefs=result.solution.eigen_vectors[i];
+            temp.state=states[i];
+            my_pair.push_back(temp);
+            add_kappa(states[i].k);                    //add new kappa into the collection
         }            //now I get the pair
     }
     
