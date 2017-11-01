@@ -75,7 +75,7 @@ unordered_map<string, double > Angular_map;                  //Stroe the value A
 
 
 
-int main(int argc, char ** argv){
+int main(){
     /*test the time*/
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();
     unordered_map<string, double>::iterator Angular_ptr;
@@ -89,16 +89,12 @@ int main(int argc, char ** argv){
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;
     /*determine the Z and N;*/
-    // cout << "Z=: ";
-    // cin  >> proton_number;
-    // cout << "N=: ";
-    // cin >> neutron_number;
-    // cout << "Deformation_parameter=: ";
-    // cin >> Deformation_parameter;
-    proton_number = atoi(argv[1]);
-    neutron_number = atoi(argv[2]);
-    Deformation_parameter = stod(argv[3]);
-
+    cout << "Z=: ";
+    cin  >> proton_number;
+    cout << "N=: ";
+    cin >> neutron_number;
+    cout << "Deformation_parameter=: ";
+    cin >> Deformation_parameter;
     preprocessing();                    //create the states_map and angular_map
     preprocessing_2(Phi, W, B, A);      //initialize the PHI W B A potential
     /*Initialize the densities to 0*/
@@ -117,7 +113,6 @@ int main(int argc, char ** argv){
     double max_m = -min_m;
     
     cout<<"finishing processing"<<endl;
-    cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
     cout << "Deformation_parameter = " << Deformation_parameter << endl;
     /*start iteration */
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
@@ -181,22 +176,17 @@ int main(int argc, char ** argv){
     
     /* option part ,
      out put data */
-    // for(int i = 0 ;i < max_L; i++){
-    //     ofstream outfile;
-    //     ofstream outfile2;
-    //     outfile.open("density" + to_string(i) + ".txt");
-    //     outfile2.open("potential" + to_string(i) + ".txt");
-    //     for(int j = 0; j < N; j++){
-    //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-    //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-    //     }
-    //     outfile.close();
-    //     outfile2.close();
-    // }
-    ofstream outfile;
-    outfile.open("density" + to_string(Deformation_parameter) + ".txt");
-    for(int j = 0; j < N; j++){
-    	outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl; 
+    for(int i = 0 ;i < max_L; i++){
+        ofstream outfile;
+        ofstream outfile2;
+        outfile.open("density" + to_string(i) + ".txt");
+        outfile2.open("potential" + to_string(i) + ".txt");
+        for(int j = 0; j < N; j++){
+            outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+            outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+        }
+        outfile.close();
+        outfile2.close();
     }
     
     /* get time */
