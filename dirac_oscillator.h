@@ -1,9 +1,9 @@
-//tested
-
+/* The energy are in the units of fm -1
+   The wave function are radial part and
+   normalized to 1*/
 #include "HOStuff.h"
 #include<iostream>
 using namespace std;
-//becareful this file returns radial part
 
 class dirac_oscillator{
 private:

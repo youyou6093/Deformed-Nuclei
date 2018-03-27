@@ -22,7 +22,7 @@ using namespace std;
 
 struct eig2{
     eig solution;
-    double m;
+    int m;
 };
 
 /*compare function for eig2 struct*/
@@ -49,7 +49,7 @@ struct solution_wave_function{                // a struct that stores wave funct
 class Solution{
 public:
     vector<coef_pair> my_pair;
-    double m;     //the quantum number of this solution
+    int m;     //the quantum number of this solution
     double energy;
     vector<int> kappas;
     State primary_state;
@@ -67,7 +67,7 @@ public:
     
     
     Solution(){
-        m=0.0;
+        m=0;
         energy=0.0;
     }
     
@@ -95,20 +95,27 @@ public:
     void get_primary_state(){
         vector<State> states=generate_statesm(m, max_L);
         int max=0;
+        int sign = 1;
         for(int i=0;i<my_pair.size();i++)
             if (abs(my_pair[i].coefs)>abs(my_pair[max].coefs)){
                 max=i;
-                
-                //cout << max <<' ' << states[max] << ' ' << abs(my_pair[max].coefs) << endl;
             }
         
+        /* new modification, make sure the primary states is positive */
+        if ((abs(my_pair[max].coefs) * my_pair[max].coefs) >= 0)
+            sign = 1;
+        else
+            sign = -1;
         
+        for(int i = 0; i < my_pair.size(); i++)
+            my_pair[i].coefs *= sign;
+            
         primary_state=my_pair[max].state;
         
         
     }
     
-    
+    //big mistake found        01/19/2018
     solution_wave_function get_wave_function(int kappa){
         vector<double> upper;
         vector<double> lower,g,f;
@@ -124,9 +131,9 @@ public:
                 States_ptr=States_map.find(temp.state.key);
                 g=States_ptr->second[0];   //get the wavefunctions
                 f=States_ptr->second[1];
-                for(int i=0;i<N;i++){
-                    upper[i]+=g[i]*temp.coefs;   //add it to our wavefunction
-                    lower[i]+=f[i]*temp.coefs;
+                for(int j=0;j<N;j++){
+                    upper[j]+=g[j]*temp.coefs;   //add it to our wavefunction
+                    lower[j]+=f[j]*temp.coefs;
                 }
             }
         }
@@ -138,6 +145,9 @@ public:
     }
     
     void get_all_wavefunction(){               //get all wavefunctions that I need
+        get_primary_state();                   //get primary state and correct the sign
+        
+        
         for(int i=0;i<kappas.size();i++){
             wavefunctions.push_back(get_wave_function(kappas[i]));
         }

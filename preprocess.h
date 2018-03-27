@@ -3,8 +3,6 @@
 //  
 //
 //  Created by Junjie Yang on 10/25/17.
-//
-// right now the neutron and proton have different potentials
 #ifndef preprocess_h
 #define preprocess_h
 
@@ -27,7 +25,6 @@ void preprocessing(){
     parameter_file >> ks;
     parameter_file >> ka;
     /*--------------------------------------------- */
-    
     cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
     cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
     cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl;
@@ -44,7 +41,10 @@ void preprocessing(){
         fx.push_back(h*i+rmin);   //construct the x array for all the basis
     
     /*constructed the States hash table*/
-    vector<State>states_1 = generate_statesm(0.5,MAX_KAPPA);  //this is the largest basis, gives me everything in the basis
+    
+    /*this is the largest basis, gives me everything in the basis,
+      MAX_KAPPA is defined in the main.cpp*/
+    vector<State>states_1 = generate_statesm(1,MAX_KAPPA);  
     for(int i=0;i<states_1.size();i++){
         dirac_oscillator ho(states_1[i].sign,states_1[i].n,states_1[i].k,b,rmin,rmax,N);
         wave_function.clear();   //empty the array
@@ -53,20 +53,20 @@ void preprocessing(){
         States_map.insert(make_pair(states_1[i].key, wave_function));
         Energy_map.insert(make_pair(states_1[i].key, ho.E));
     }
-    /*construct the angular hash table, basically read values from the file and store it inside unordered set*/
-    vector<string> keys_1,value_1;
-    string word;
-    ifstream infile;
-    infile.open("test.txt");
-    while(infile>>word){
-        keys_1.push_back(word);
-        infile>>word;
-        value_1.push_back(word);
-    }
-    infile.close();
-    for(int i=0;i<keys_1.size();i++){
-        Angular_map.insert(make_pair(keys_1[i],stod(value_1[i])));
-    }
+    // /*construct the angular hash table, basically read values from the file and store it inside unordered set*/
+    // vector<string> keys_1,value_1;
+    // string word;
+    // ifstream infile;
+    // infile.open("test.txt");
+    // while(infile>>word){
+    //     keys_1.push_back(word);
+    //     infile>>word;
+    //     value_1.push_back(word);
+    // }
+    // infile.close();
+    // for(int i=0;i<keys_1.size();i++){
+    //     Angular_map.insert(make_pair(keys_1[i],stod(value_1[i])));
+    // }
 }
 
 
@@ -146,16 +146,18 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
         }
     }
     
-    
+    /* USE vector potential*/
     /* put the potential we add to the scalar and vector part, depend on what I want the potential to be*/
-    if(particle_type == 0){
-        for(int i=0;i<N;i++){
-            scalar_p[L][i] += Potential[i];
+    if (L < max_L){
+        if(particle_type == 0){
+            for(int i=0;i<N;i++){
+                vector_p[L][i] += Potential[i];
+            }
         }
-    }
-    else{
-        for( int i =0; i < N; i++){
-            scalar_p[L][i] -= Potential[i];
+        else{
+            for( int i =0; i < N; i++){
+                vector_p[L][i] -= Potential[i];
+            }
         }
     }
 }

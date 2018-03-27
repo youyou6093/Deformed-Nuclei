@@ -292,7 +292,41 @@ Try linear parameters
 ## Oct 24
 complete self consistency on Linear conditions, still testing
 
+## Nov 14
+Result is not good.
 
-#### Let the function read the parameters
+## Nov 22
+The calculations of the matrix element is verifyed
+
+
+
+#### maybe the way I generate the angular dependence is wrong, change the check function.
 #### add threads
-#### find the reason why the program doesn't work on deformed condition
+
+
+## Checklist:
+
+1.The basis I choose is complete
+2.Check Get Solution
+3.Check get density
+4.Check update Potential
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

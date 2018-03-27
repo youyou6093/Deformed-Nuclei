@@ -10,9 +10,9 @@ using namespace std;
 class State{
 public:
     int n,k,sign;
-    double m;
+    int m;
     string key;
-    State(int a,int b,double c,int d):n(a),k(b),m(c),sign(d){
+    State(int a,int b,int c,int d):n(a),k(b),m(c),sign(d){
         key=to_string(n)+"."+to_string(k)+"."+to_string(sign);
     }
     

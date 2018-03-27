@@ -48,7 +48,7 @@ double compute_energy(vector<eig2> &occp,vector<eig2> &occn,vector<vector<double
     
 }
 
-double magic(int n){
+int magic(int n){
     vector<int> a;
     a.push_back(-1);
     a.push_back(-2);
@@ -86,7 +86,8 @@ double magic(int n){
             min=a[i];
         }
     }
-    return abs(min)-0.5;
+//    return abs(min)-0.5;
+    return 2 * abs(min) - 1;
 }
 
 
@@ -136,7 +137,7 @@ void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &oc
 
 
 /* for specific m, return the solution eig2,contains m */
-vector<eig2> get_temp_solution(vector<eig> &results,double m){
+vector<eig2> get_temp_solution(vector<eig> &results,int m){
     eig2 temp;
     vector<eig2> temp_solution;
     for(int i=0;i<results.size();i++){

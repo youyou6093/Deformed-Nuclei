@@ -9,6 +9,7 @@
 
 #ifndef Density_h
 #define Density_h
+#include <math.h>
 #include "Solution.h"
 #include <vector>
 #include "vector_compute.h"
@@ -25,12 +26,20 @@ vector<Solution> get_solutions_object(vector<eig2> occ){
 }
 
 vector<int> get_possible_L(int k1,int k2){
-    double j1=abs(k1)-0.5;
-    double j2=abs(k2)-0.5;
+//    double j1=abs(k1)-0.5;
+//    double j2=abs(k2)-0.5;
+    int j1 = 2 * abs(k1) - 1;
+    int j2 = 2 * abs(k2) - 1;
     vector<int> L_group;
-    for(int i=int(abs(j1-j2)) ; i<int(abs(j1+j2+1)) ; i++){
-        L_group.push_back(i);
+//    for(int i=int(abs(j1-j2)) ; i<int(abs(j1+j2+1)) ; i++){
+//        L_group.push_back(i);
+//    }
+    //this might not be verygood
+    for(int i = abs(j1-j2) ; i <= j1 + j2 ; i+=2){
+        L_group.push_back(i / 2);
     }
+    
+    
     return L_group;
 }
 
@@ -75,7 +84,7 @@ public:
     
     void compute_one_(int a,int b,int num){
         Solution x=solution[num];      //one of the occ state
-        double m=x.m;                  //get m
+        int m=x.m;                  //get m
         double coef,coef2;             //coef is the A(m,k1,k2,L) in my calculations
         vector<int> kappas=x.kappas;   //all Kappa in this occ state
         int k1=x.wavefunctions[a].kappa;        // the first kappa of this state
@@ -91,14 +100,28 @@ public:
         vector<int> L_group = get_possible_L(k1,k2);  //all the possible L get from this two kappa
         for (int i=0;i<L_group.size();i++){
             if(L_group[i]<max_L){                             //make sure it is within range
-                coef = Angular_map.find(generate_key(m, k1, k2, L_group[i]))->second;
-                coef2 = sqrt((2.0*i+1)/4/PI);
+//                coef = Angular_map.find(generate_key(m, k1, k2, L_group[i]))->second;
+                coef = Angular_depedencek(k1, k2, m, L_group[i]);
+//                coef2 = sqrt((2.0*i+1)/4/PI);
+//                coef2 = sqrt((2.0 * L_group[i] + 1)/4/PI);
+                /* compute l1, l2*/
+                int l1, l2;
+                if (k1 > 0) l1 = k1;
+                else l1 = -k1 - 1;
+                if (k2 > 0) l2 = k2;
+                else l2 = -k2 - 1;
+                
+                
+                
+                if ((L_group[i] + l1 + l2) % 2 != 0) coef = 0.0;
                 den temp;                       //temp holder for this channel of this state
                 for(int j=0;j<N;j++){
-                    temp.s.push_back((coef*(radial1[j]-radial2[j])*coef2));          //scalar
-                    temp.v.push_back((coef*(radial1[j]+radial2[j])*coef2));          //vector
+                    temp.s.push_back((coef*(radial1[j]-radial2[j])));          //scalar
+                    temp.v.push_back((coef*(radial1[j]+radial2[j])));          //vector
                 }
-                append(temp,i);
+                //append(temp,i);
+                //another big mistake, modified on 01/22/2018
+                append(temp, L_group[i]);
             }
         }
        
@@ -129,7 +152,7 @@ public:
 //get density of everything for every iteration
 void generate_density(vector<eig2> &occn, vector<eig2> &occp, vector<vector<double>> &dens,
                           vector<vector<double>> &denv,vector<vector<double>> &denp,vector<vector<double>> &den3){
-    Density all_states_p(occp),all_states_n(occn);
+    Density all_states_p(occp),all_states_n(occn); // the constructor will find the wave funcitons of all occ state
     vector<den> density_p,density_n;
     vector<vector<double>> denvp,denvn,densn,densp;
     all_states_p.Compute_all();

@@ -1,8 +1,13 @@
+/*
+ The added potential right now is r Y10 and in units Mev.
+*/
+
+
 #include <chrono>
 #include "vector_compute.h"
+#include "generate_state.h"
 #include "dirac_oscillator.h"
 #include <iostream>
-#include "generate_state.h"
 #include <unordered_map>
 #include <string>
 #include <fstream>
@@ -18,6 +23,7 @@
 #include <algorithm>
 using namespace std;
 #define MAX_KAPPA 7
+#define ITENUM 200
 
 /*--------------------set up global varialbes-----------------------------*/
 
@@ -46,25 +52,21 @@ double ka=1.420333/hbarc;
 /* Computation constants */
 double b=2.4,rmin=0.0,rmax=20.0;
 int N=801;
-/*Max value of L CHANNEL, it is initialized to 1( nothing at all! ).
- However, it will change after 50(or other values) iterations */
-int max_L = 4;
-/*The potential I want to add, initialized to 0 but
- will change to 1(or other value) after some iterations */
+/*Max value of L CHANNEL*/
+int max_L = 1;
+/*The potential I want to add*/
 int Potential_channel = 1;
-/*After a few iterations it will also change */
-double Deformation_parameter = 0.05;
+double Deformation_parameter = 0.00;
 double h=(rmax-rmin)/(N-1);       //grid size
 int proton_number, neutron_number;
-vector<double> start ={450.0,400.0,5.0,0.0}; //initial value of Phi W B A in the wood-saxon form
-vector<double> fx;                //X value array
+vector<double> start ={450.0,400.0,5.0,0.0}; //initial value of Phi W B A in the wood-saxon form, units in Mev
+vector<double> fx;                //x axis
 vector<double> empty;             //empty vector, will be initialized later
 unordered_map<string, vector<vector<double>> > States_map;   //store the infos about the wavefunctions when given states
 unordered_map<string, double> Energy_map;                    //store the energies for every state
-unordered_map<string, double > Angular_map;                  //Stroe the value A in my notes
+// unordered_map<string, double > Angular_map;                  //Stroe the value A in my notes
+int max_k; //max kappa when I want to construct the basis 
 /*---------------------------------finishing global varialbes-------------------------------------*/
-
-
 #include "preprocess.h"
 
 
@@ -73,11 +75,23 @@ unordered_map<string, double > Angular_map;                  //Stroe the value A
 
 
 
-
-
+/*body of the function*/
 int main(int argc, char ** argv){
-    /*test the time*/
-    chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();
+    
+    
+    /*test part*/
+    
+//    cout << Angular_depedencek(14,14,27,0) << endl;
+//    cout << Angular_depedencek(14,14,-27,0) << endl;
+    
+    
+    
+    
+    
+    
+    
+    
+    chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
     unordered_map<string, double>::iterator Angular_ptr;
     unordered_map<string, vector<vector<double>>>::iterator States_ptr;
     vector<vector<double>> Phi,W,B,A,dens,denv,denp,den3,EFF_Phi,EFF_W,EFF_B,EFF_A;
@@ -88,19 +102,18 @@ int main(int argc, char ** argv){
     vector<eig2> occp,occn;        //occupied states of protons and neutrons
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;
-    /*determine the Z and N;*/
-    // cout << "Z=: ";
-    // cin  >> proton_number;
-    // cout << "N=: ";
-    // cin >> neutron_number;
-    // cout << "Deformation_parameter=: ";
-    // cin >> Deformation_parameter;
+
+    //Command line part
     proton_number = atoi(argv[1]);
     neutron_number = atoi(argv[2]);
     Deformation_parameter = stod(argv[3]);
+    max_L = atoi(argv[4]);
+    max_k = atoi(argv[5]);
 
-    preprocessing();                    //create the states_map and angular_map
-    preprocessing_2(Phi, W, B, A);      //initialize the PHI W B A potential
+    preprocessing();                    //Prepare the states Hash Map
+    /*initialize the PHI W B A potential
+      the potentials here are all in Mev*/
+    preprocessing_2(Phi, W, B, A);
     /*Initialize the densities to 0*/
     for(int i=0;i<max_L;i++){
         dens.push_back(empty);
@@ -110,38 +123,44 @@ int main(int argc, char ** argv){
     }
     /*Initially, there is no dipole potential added*/
     for(int i=0;i<N;i++)               
-        Potential.push_back(0.00); 
-    EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;   //set everything to zero;
-    /*determine the range of m*/
-    double min_m = -magic(max(proton_number,neutron_number));
-    double max_m = -min_m;
-    
-    cout<<"finishing processing"<<endl;
+        Potential.push_back(0.00);
+    /*Set the effecitive density in KG part to be the same as
+      original density*/
+    EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;
+    /*Determine the range of m, just roughly determine*/
+    int min_m = -magic(max(proton_number,neutron_number));
+    int max_m = -min_m;
+    cout<<"Finishing processing"<<endl;
     cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
     cout << "Deformation_parameter = " << Deformation_parameter << endl;
-    /*start iteration */
+    /*The occupied states from solving */
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
     
     
-    for(int ite=0;ite<50;ite++){
+    for(int ite=0;ite<ITENUM;ite++){
         chrono::steady_clock::time_point tpold = chrono::steady_clock::now();
+        /*Make sure OCCs are empty*/
         occp_raw.clear();
         occn_raw.clear();
         occp.clear();
-        occn.clear();            //make sure they are empty
-        for(int i=0;i<N;i++)                //initialize the excitation term
-            Potential[i] = fx[i] * Deformation_parameter;
-        /*because every iteration I update the meson potentials so I need to recompute the scalar
-         and vector potentials*/
-        generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron
+        occn.clear();
+        /* The potential term added to my model*/
+        for(int i=0;i<N;i++)
+            Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        /*Every iteration it updates the meson potentials
+          ,so it need to recompute the scalar
+           and vector potentials*/
+        
+        /*those two functions are in preprocess.h*/
+        generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron   preprocess.h
         generate_potential(Phi, W, B, A, Potential, scalar_p, vector_p, Potential_channel, 1);   //proton
         
-        /* solve the dirac equation for one iteration */
-        for(double m = min_m ; m < max_m + 1 ; m++){
-            States_m=generate_statesm(m, max_L);        //states for this m
-            //generate_full_matrix(scalar_n, vector_n, States_m, m);
+        /* Solve the dirac equation*/
+        for(int m = min_m ; m < max_m + 1 ; m+=2){      //The m here is actually 2 m
+            States_m=generate_statesm(m, max_L);        //States for this m
+//            cout << "States number is : " << States_m.size() << endl;
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);
-            if (M.size()!=States_m.size()) cout<<"error!!"<<endl;
+            if (M.size()!=States_m.size()) cout<<"Error!!"<<endl;
             /*another test */
             flat=flat_matrix(M);
             diag=matrix_diag(flat,int(States_m.size()));    //diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix
@@ -156,21 +175,35 @@ int main(int argc, char ** argv){
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
         }
         
-        get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state
-        Final_occn=get_solutions_object(occn);                   //get solution object
+        /* Form the solution for occupied state*/
+        get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state, utility.h
+        Final_occn=get_solutions_object(occn);                   //get solution object, density.h
         Final_occp=get_solutions_object(occp);
-    
-        generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states
-        
+        /* Form the densities */
+        generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states, density.h
         for(int i = 0; i < max_L; i++)
-            cout << "channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+            cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
         /* compute the effective density
-         solve the klein-gordon equation */
+         solve the klein-gordon equation
+         update the potentials*/
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int i = 0; i < max_L; i++)
             cout <<"channel="<<i<<':'<< Phi[i][0] <<' '<< W[i][0]<<' '<<B[i][0]<<' '<<A[i][0]<<endl;
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
+        
+        /* output the energy*/
+        for(int ii = 0; ii < occp.size(); ii ++){
+            eig2 test = occp[ii];
+            Solution temp = Solution(test);
+            cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        }
+        for(int ii = 0; ii < occn.size(); ii ++){
+            eig2 test = occn[ii];
+            Solution temp = Solution(test);
+            cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        }
+        
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
         
@@ -180,24 +213,72 @@ int main(int argc, char ** argv){
     } //end the iterations
     
     /* option part ,
-     out put data */
-    // for(int i = 0 ;i < max_L; i++){
-    //     ofstream outfile;
-    //     ofstream outfile2;
-    //     outfile.open("density" + to_string(i) + ".txt");
-    //     outfile2.open("potential" + to_string(i) + ".txt");
-    //     for(int j = 0; j < N; j++){
-    //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-    //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+     output all the potentials and densities */
+      for(int i = 0 ;i < max_L; i++){
+          ofstream outfile;
+          ofstream outfile2;
+          outfile.open("density" + to_string(i) + ".txt");
+          outfile2.open("potential" + to_string(i) + ".txt");
+          for(int j = 0; j < N; j++){
+              outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+              outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+          }
+          outfile.close();
+          outfile2.close();
+      }
+//   if (max_L > 1){
+//       ofstream outfile;
+//       outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
+//       for(int j = 0; j < N; j++){
+//           outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
+//       }
+//   }
+
+ 
+    
+    
+    
+    
+ /* output wavefunctions */
+
+//     for(int ii = 0; ii < occp.size(); ii ++){
+//         eig2 test = occp[ii];
+//         Solution temp = Solution(test);
+//         temp.get_all_wavefunction();
+//         cout << ii << " energy for occp = " << temp.energy << endl;
+// //        mkdir("wfp" + to_string(ii));
+//         string some = "mkdir " + string("testout/wfp") + to_string(ii);
+//         const char * path = some.c_str();
+//         system(path);
+//         for(int i = 0; i < temp.wavefunctions.size(); i ++){
+//             ofstream outfile;
+//             outfile.open("testout/wfp" + to_string(ii) + '/' + "wavefunction" + to_string(temp.wavefunctions[i].kappa) + ".txt");
+//             for(int j = 0; j < N; j++){
+//                 outfile << fx[j] << ' ' << temp.wavefunctions[i].upper[j] << ' ' << temp.wavefunctions[i].lower[j] << ' ' << temp.m << ' ' << temp.energy << endl;
+//             }
+//             outfile.close();
+//         }
+//     }
+    
+    
+    // for(int ii = 0; ii < occn.size(); ii ++){
+    //     eig2 test = occn[ii];
+    //     Solution temp = Solution(test);
+    //     temp.get_all_wavefunction();
+    //     cout << ii << " energy for occn = " << temp.energy << endl;
+    //     string some = "mkdir " + string("testout/wfn") + to_string(ii);
+    //     const char * path = some.c_str();
+    //     system(path);
+    //     for(int i = 0; i < temp.wavefunctions.size(); i ++){
+    //         ofstream outfile;
+    //         outfile.open("testout/wfn" + to_string(ii) + '/' + "wavefunction" + to_string(temp.wavefunctions[i].kappa) + ".txt");
+    //         for(int j = 0; j < N; j++){
+    //             outfile << fx[j] << ' ' << temp.wavefunctions[i].upper[j] << ' ' << temp.wavefunctions[i].lower[j] << ' ' << temp.m << ' ' << temp.energy << endl;
+    //         }
+    //         outfile.close();
     //     }
-    //     outfile.close();
-    //     outfile2.close();
     // }
-    ofstream outfile;
-    outfile.open("density" + to_string(Deformation_parameter) + ".txt");
-    for(int j = 0; j < N; j++){
-    	outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl; 
-    }
+    
     
     /* get time */
     chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
