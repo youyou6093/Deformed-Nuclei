@@ -4,9 +4,6 @@
 //
 //  Created by Junjie Yang on 7/13/17.
 //  Copyright © 2017 Junjie Yang. All rights reserved.
-// need to check for correctnese
-//tested for the naive case
-
 #ifndef Density_h
 #define Density_h
 #include <math.h>
@@ -29,7 +26,6 @@ vector<Solution> get_solutions_object(vector<eig2> occ){
 }
 
 vector<int> get_possible_L(int k1,int k2){
-//    double j1=abs(k1)-0.5;
 //    double j2=abs(k2)-0.5;
     int j1 = 2 * abs(k1) - 1;
     int j2 = 2 * abs(k2) - 1;

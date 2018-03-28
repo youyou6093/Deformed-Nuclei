@@ -145,17 +145,11 @@ public:
     /*get the complete wavefunction*/
     void get_all_wavefunction(){               //get all wavefunctions that I need
         get_primary_state();                   //get primary state and correct the sign
+        wavefunctions.clear();
         for(int i=0;i<kappas.size();i++){
             wavefunctions.push_back(get_wave_function(kappas[i]));
         }
     }
-    
-    
-    
-    
-    
-    
-    
 };
 
 
