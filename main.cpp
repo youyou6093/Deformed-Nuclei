@@ -161,17 +161,21 @@ int main(int argc, char ** argv){
 //            cout << "States number is : " << States_m.size() << endl;
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);
             if (M.size()!=States_m.size()) cout<<"Error!!"<<endl;
-            /*another test */
             flat=flat_matrix(M);
-            diag=matrix_diag(flat,int(States_m.size()));    //diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix
-            diag.get_results();                             //diag.results is a matrix full of eigvalues and eigenvectors.
-            temp_solution=get_temp_solution(diag.results, m);   //add m to the results
+            /*diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix*/
+            diag=matrix_diag(flat,int(States_m.size()));
+            diag.get_results();
+            /*diag.results is a matrix full of eigvalues and eigenvectors.
+              I need to add m to the result to form the basis*/
+            temp_solution = get_temp_solution(diag.results, m);
+            /*Insert all solutions for this m*/
             occn_raw.insert(occn_raw.end(), temp_solution.begin(), temp_solution.end());
-            M=generate_full_matrix(scalar_p, vector_p, States_m, m);    //get the matrix for the specific m,proton
+            /*get the matrix for the specific m,proton*/
+            M=generate_full_matrix(scalar_p, vector_p, States_m, m);
             flat=flat_matrix(M);
             diag=matrix_diag(flat,int(States_m.size()));
             diag.get_results();
-            temp_solution=get_temp_solution(diag.results, m);
+            temp_solution = get_temp_solution(diag.results, m);
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
         }
         

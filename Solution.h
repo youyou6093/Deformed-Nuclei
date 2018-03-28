@@ -13,7 +13,6 @@
 #include "generate_state.h"
 #include<vector>
 #include "states.cpp"
-
 extern int max_L;
 extern int N;
 extern unordered_map<string, vector<vector<double>> > States_map;
@@ -30,17 +29,18 @@ bool compare_eig2(eig2 a,eig2 b){
     return (a.solution.eigen_values<b.solution.eigen_values);
 }
 
-
-
-
-
-
-struct coef_pair{             //takes coefficient and state
+/* Combine the coefficient of the eigenvector and
+   the state together so I could form the wave function
+   of the eigenvalues */
+struct coef_pair{
     double coefs;
     State state;
 };
 
-struct solution_wave_function{                // a struct that stores wave function for one kappa
+
+/* A struct that stores wave function for one kappa
+   channel*/
+struct solution_wave_function{
     int kappa;
     vector<double>upper;
     vector<double>lower;
@@ -55,53 +55,50 @@ public:
     State primary_state;
     vector<solution_wave_function> wavefunctions;
     
+    Solution(){
+        m=0;
+        energy=0.0;
+    }
     
-    bool add_kappa(int k){                         //decide whether add new kappa into collection
-        for(int i=0;i<kappas.size();i++){
-            if (k==kappas[i])
+    /*An eigenvalue from diagnolizing matrix*/
+    Solution(eig2 result){
+        this->m = result.m;                                //m is the quantum numbrer
+        energy=result.solution.eigen_values;               //Energy for the solution
+        coef_pair temp;                                    //Just a holder for the pair
+        vector<State> states=generate_statesm(m,max_L);    //Generate the basis for this m
+        for(int i=0;i<states.size();i++){
+            /* Avoiding small coefficients due to some numerical errors*/
+            if (abs(result.solution.eigen_vectors[i])>1e-5){}
+            temp.coefs=result.solution.eigen_vectors[i];
+            temp.state=states[i];
+            my_pair.push_back(temp);
+            /*Every state has it's own kappa so I will add this state's
+             kappa into the solution*/
+            add_kappa(states[i].k);
+        }
+    }
+    
+    /*Decide whether add new kappa into collection*/
+    bool add_kappa(int k){
+        for(int i = 0;i<kappas.size();i++){
+            if (k == kappas[i])
                 return true;
         }
         kappas.push_back(k);
         return false;
     }
     
-    
-    Solution(){
-        m=0;
-        energy=0.0;
-    }
-    
-    
-    
-    Solution(eig2 result){                //1 eigenvalue of diagnolization matrix
-        this->m=result.m;                                //m is the quantum numbrer
-        energy=result.solution.eigen_values;               //energy for the solution
-        coef_pair temp;                           //holder
-        vector<State> states=generate_statesm(m,max_L);             //the states for this m
-        for(int i=0;i<states.size();i++){
-            if (abs(result.solution.eigen_vectors[i])>1e-5){   //automaticlly avoid small coefs
-                //dont use this right now
-                
-            }
-            //take all the states
-            temp.coefs=result.solution.eigen_vectors[i];
-            temp.state=states[i];
-            my_pair.push_back(temp);
-            add_kappa(states[i].k);                    //add new kappa into the collection
-        }            //now I get the pair
-    }
-    
-    
+    /*Find the primary state*/
     void get_primary_state(){
-        vector<State> states=generate_statesm(m, max_L);
-        int max=0;
+        vector<State> states = generate_statesm(m, max_L);
+        int max = 0;
         int sign = 1;
         for(int i=0;i<my_pair.size();i++)
             if (abs(my_pair[i].coefs)>abs(my_pair[max].coefs)){
                 max=i;
             }
         
-        /* new modification, make sure the primary states is positive */
+        /* new modification, make sure the primary state is positive */
         if ((abs(my_pair[max].coefs) * my_pair[max].coefs) >= 0)
             sign = 1;
         else
@@ -115,10 +112,10 @@ public:
         
     }
     
-    //big mistake found        01/19/2018
+    
+    /*get the wave function for one kappa*/
     solution_wave_function get_wave_function(int kappa){
-        vector<double> upper;
-        vector<double> lower,g,f;
+        vector<double> upper,lower,g,f;
         unordered_map<string, vector<vector<double>>>::iterator States_ptr;
         coef_pair temp;
         for(int i=0;i<N;i++){
@@ -144,10 +141,10 @@ public:
         return wavefunction1;
     }
     
+    
+    /*get the complete wavefunction*/
     void get_all_wavefunction(){               //get all wavefunctions that I need
         get_primary_state();                   //get primary state and correct the sign
-        
-        
         for(int i=0;i<kappas.size();i++){
             wavefunctions.push_back(get_wave_function(kappas[i]));
         }

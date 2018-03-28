@@ -15,6 +15,9 @@
 #include "vector_compute.h"
 #include "generate_matrix.h"
 
+
+
+/*This function transfer the eigenvalues and eigenvetors into an object named solution*/
 vector<Solution> get_solutions_object(vector<eig2> occ){
     vector<Solution> Final_occ;
     Solution temp;
