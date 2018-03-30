@@ -31,7 +31,7 @@ extern"C" {
                   double* a7,double* a8,double* a9);
 }
 
-/*compute the  cg coefficients based on the three-symbol*/
+/*Compute the  cg coefficients based on the three-symbol*/
 double cg_(double j1,double j2,double j3, double m1, double m2, double m3){
     return pow(-1, j1 - j2 - m3) * sqrt(2 * j3 + 1) * tj_(&j1, &j2, &j3, &m1, &m2, &m3);
 }

@@ -1,3 +1,5 @@
+/* Need additional check for this part*/
+
 //
 //  effective_density.h
 //  deform_c++
@@ -18,7 +20,7 @@ extern"C" {
     double coef9_(double* a1,double* a2,double* a3,
                   double* a4,double* a5,double* a6,
                   double* a7,double* a8,double* a9);
-}         //declare that there is something in the .o library
+}
 
 
 
@@ -27,14 +29,13 @@ extern vector<double> empty;
 extern double lambdas,lambdav,lambda,ka,ks,ms,mv,mp,mg,gs,gv,gp,gg;
 
 
-
-double pcg_(double j1,double j2,double j3){            //compute the parity cg coefficients based on the three-symbol
+/*Compute the parity cg coefficients based on the three-symbol*/
+double pcg_(double j1,double j2,double j3){
     double m1=0;
     double m2=0;
     double m3=0;
     return pow(-1,j1-j2)*sqrt(2*j3+1)*tj_(&j1, &j2, &j3, &m1,&m2,&m3);
 }
-//need to verify
 
 
 vector<int> possible_L(int l1,int l2){
@@ -47,6 +48,8 @@ vector<int> possible_L(int l1,int l2){
     return Ls;
 }
 
+
+/*Multiple two Legendre series together*/
 vector<vector<double>> multiplication(vector<vector<double>> &vec1,vector<vector<double>> &vec2){
     vector<vector<double>> new_vec;
     vector<double> temp;
@@ -72,12 +75,11 @@ vector<vector<double>> multiplication(vector<vector<double>> &vec1,vector<vector
             }
         }
     }
-    
     return new_vec;
 }
 
 
-//get the effective density
+/*get the effective density*/
 void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                            vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
                            vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp){
@@ -103,7 +105,7 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
     
 }
 
-
+/* Sloving the Klein-Gordon Equation*/
 void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                    vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
                    vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp,
@@ -113,6 +115,11 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
         W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein(mv, EFF_W[L], i)/3.0;
         B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein(mp , EFF_B[L], i)/3.0;
         A[L][i] = hbarc * gg * klein(mg, denp[L], i);
+        
+//        Phi[L][i] =   hbarc * gs * klein(ms,  EFF_Phi[L] , i); //not sure whether I can just put gs outside
+//        W[L][i] =    hbarc * gv * klein(mv, EFF_W[L], i);
+//        B[L][i] =  hbarc * gp * klein(mp , EFF_B[L], i);
+//        A[L][i] = hbarc * gg * klein(mg, denp[L], i);
     }
     Phi[L][0] = Phi[L][1];
     W[L][0] = W[L][1];
@@ -123,12 +130,16 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     
 }
 
+/*update the potential*/
 void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp){
-    for(int i=0;i<5;i++){        //how many iteration I want to solve klein-gordon equation
+    for(int i=0; i<5; i++){        //how many iteration I want to solve klein-gordon equation
         get_effective_density(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int j=0;j<max_L;j++){
             get_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp, j);
         }
+//        for(int j=0; j < max_L; j++)
+//            cout <<"channel="<<j<<':'<< Phi[j][0] <<' '<< W[j][0]<<' '<<B[j][0]<<' '<<A[j][0]<<endl;
+        
     }
 }
 
