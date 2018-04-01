@@ -39,6 +39,7 @@ private:
     }
     
     double p_integral(double range1,double range2){
+    	gsl_set_error_handler_off();   // this one is pretty important
         gsl_integration_workspace * w = gsl_integration_workspace_alloc (10000);
         // this 1000 might need to change;
         gsl_function F;

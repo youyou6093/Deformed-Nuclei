@@ -197,16 +197,16 @@ int main(int argc, char ** argv){
         cout<<occp.size()<<' '<<occn.size()<<endl;
         
         /* output the energy*/
-//        for(int ii = 0; ii < occp.size(); ii ++){
-//            eig2 test = occp[ii];
-//            Solution temp = Solution(test);
-//            cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
-//        }
-//        for(int ii = 0; ii < occn.size(); ii ++){
-//            eig2 test = occn[ii];
-//            Solution temp = Solution(test);
-//            cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
-//        }
+       for(int ii = 0; ii < occp.size(); ii ++){
+           eig2 test = occp[ii];
+           Solution temp = Solution(test);
+           cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
+       }
+       for(int ii = 0; ii < occn.size(); ii ++){
+           eig2 test = occn[ii];
+           Solution temp = Solution(test);
+           cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
+       }
         
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
