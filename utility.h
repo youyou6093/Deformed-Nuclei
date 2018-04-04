@@ -112,13 +112,13 @@ void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &oc
     for(int i=0;i<occp_raw.size();i++){
         /*Transfer the energy units to Mev and also substract the mass*/
         occp_raw[i].solution.eigen_values = occp_raw[i].solution.eigen_values * hbarc - 939;
-        if ((occp_raw[i].solution.eigen_values < 5) && (occp_raw[i].solution.eigen_values > -939)){
+        if ((occp_raw[i].solution.eigen_values < 5) && (occp_raw[i].solution.eigen_values > -100)){
             occp.push_back(occp_raw[i]);
         }
     }
     for(int i=0;i<occn_raw.size();i++){
         occn_raw[i].solution.eigen_values=occn_raw[i].solution.eigen_values*hbarc-939;
-        if ((occn_raw[i].solution.eigen_values<5) && (occn_raw[i].solution.eigen_values>-939)){
+        if ((occn_raw[i].solution.eigen_values<5) && (occn_raw[i].solution.eigen_values>-100)){
             occn.push_back(occn_raw[i]);
         }
     }

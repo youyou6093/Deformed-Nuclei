@@ -23,7 +23,7 @@
 #include <algorithm>
 using namespace std;
 #define MAX_KAPPA 7
-#define ITENUM 200
+#define ITENUM 60
 
 /*--------------------set up global varialbes-----------------------------*/
 
@@ -146,8 +146,16 @@ int main(int argc, char ** argv){
         occp.clear();
         occn.clear();
         /* The potential term added to my model*/
+        // for(int i=0;i<N;i++){
+        // 	if (fx[i] <= 6)
+        //     	Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        //     else
+        //     	Potential[i] = 0.0;
+        // }
         for(int i=0;i<N;i++)
-            Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI) * exp(- 0.4 * fx[i]);
+        	Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI) * exp(- 0.4 * fx[i]);
+
+        // * exp(- 0.4 * fx[i])
         /*Every iteration it updates the meson potentials
           ,so it need to recompute the scalar
            and vector potentials*/
@@ -187,16 +195,16 @@ int main(int argc, char ** argv){
         /* Form the densities */
         generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states, density.h
         
-        if(ite > 0){
-            for(int i = 0; i < max_L; i++){
-                for(int j = 0; j < N; j++){
-                    dens[i][j] = 2.0/3 * dens_old[i][j] + 1.0/3 * dens[i][j];
-                    denv[i][j] = 2.0/3 * denv_old[i][j] + 1.0/3 * denv[i][j];
-                    den3[i][j] = 2.0/3 * den3_old[i][j] + 1.0/3 * den3[i][j];
-                    denp[i][j] = 2.0/3 * denp_old[i][j] + 1.0/3 * denp[i][j];
-                }
-            }
-        }
+        // if(ite > 0){
+        //     for(int i = 0; i < max_L; i++){
+        //         for(int j = 0; j < N; j++){
+        //             dens[i][j] = 2.0/3 * dens_old[i][j] + 1.0/3 * dens[i][j];
+        //             denv[i][j] = 2.0/3 * denv_old[i][j] + 1.0/3 * denv[i][j];
+        //             den3[i][j] = 2.0/3 * den3_old[i][j] + 1.0/3 * den3[i][j];
+        //             denp[i][j] = 2.0/3 * denp_old[i][j] + 1.0/3 * denp[i][j];
+        //         }
+        //     }
+        // }
         dens_old = dens;
         denv_old = denv;
         den3_old = den3;
@@ -214,16 +222,16 @@ int main(int argc, char ** argv){
         cout<<occp.size()<<' '<<occn.size()<<endl;
         
         /* output the energy*/
-       // for(int ii = 0; ii < occp.size(); ii ++){
-       //     eig2 test = occp[ii];
-       //     Solution temp = Solution(test);
-       //     cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
-       // }
-       // for(int ii = 0; ii < occn.size(); ii ++){
-       //     eig2 test = occn[ii];
-       //     Solution temp = Solution(test);
-       //     cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
-       // }
+        for(int ii = 0; ii < 1; ii ++){
+            eig2 test = occp[ii];
+            Solution temp = Solution(test);
+            cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        }
+        for(int ii = 0; ii < 1; ii ++){
+            eig2 test = occn[ii];
+            Solution temp = Solution(test);
+            cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        }
         
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
