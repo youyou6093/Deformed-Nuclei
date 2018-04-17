@@ -12,6 +12,7 @@
 #include "symm.h"
 #include "generate_state.h"
 #include<vector>
+#include "integrator.h"
 #include "states.cpp"
 extern int max_L;
 extern int N;
@@ -68,13 +69,15 @@ public:
         vector<State> states=generate_statesm(m,max_L);    //Generate the basis for this m
         for(int i=0;i<states.size();i++){
             /* Avoiding small coefficients due to some numerical errors*/
-            if (abs(result.solution.eigen_vectors[i])>1e-5){}
-            temp.coefs=result.solution.eigen_vectors[i];
-            temp.state=states[i];
-            my_pair.push_back(temp);
-            /*Every state has it's own kappa so I will add this state's
-             kappa into the solution*/
-            add_kappa(states[i].k);
+            // if (abs(result.solution.eigen_vectors[i])>1e-5){
+            	temp.coefs=result.solution.eigen_vectors[i];
+            	temp.state=states[i];
+            	my_pair.push_back(temp);
+            	/*Every state has it's own kappa so I will add this state's
+             	kappa into the solution*/
+            	add_kappa(states[i].k);
+            // }
+            
         }
     }
     
@@ -88,6 +91,38 @@ public:
         return false;
     }
     
+
+    /*this is more for debug purpose
+      print all */
+    void print_eigenvectors(){
+    	get_all_wavefunction();
+    	for(int i = 0; i < kappas.size(); i++){
+    		double coef_for_kappa = 0;
+    		for(int j = 0; j < my_pair.size(); j++){
+    			if (my_pair[j].state.k == kappas[i])
+    				coef_for_kappa += pow(my_pair[j].coefs, 2);
+    		}
+    		cout << "coef for " << kappas[i] << " is " << coef_for_kappa << endl;
+    	}
+
+
+    	/* the integration of this part*/
+    	double norm = 0.0;
+    	for( int i = 0 ; i < wavefunctions.size(); i++){
+    		vector<double> inte;
+    		inte.clear();
+    		for(int j = 0; j < N; j++){
+    			// cout << "something" <<endl;
+    			inte.push_back(pow(wavefunctions[i].upper[j], 2) + pow(wavefunctions[i].lower[j], 2));
+    			// inte.push_back(pow(wavefunctions[i].upper[j], 2));
+    		}
+    		norm += my_spline(inte, fx, my_tolerance).integral();
+    	}
+    	// cout << "normalization: " << norm <<endl; 
+
+    }
+
+
     /*Find the primary state*/
     void get_primary_state(){
         vector<State> states = generate_statesm(m, max_L);

@@ -11,6 +11,7 @@
 #ifndef generate_matrix_h
 #define generate_matrix_h
 #include "simps.h"
+#include "integrator.h"
 
 extern int N;
 extern int max_L;
@@ -115,7 +116,8 @@ double calculate_matrix_element(struct params & my_params,int L){
                 value3=-(1/pow(b,2))*(my_params.g1[i]*my_params.f2[i]+my_params.g2[i]*my_params.f1[i])*fx[i];
                 y3.push_back(value1+value2+value3);
             }
-            E2=simps(y3,fx);
+            // E2=simps(y3,fx);
+            E2 = my_spline(y3, fx, my_tolerance).integral();
             y3.clear();
         }
         else
@@ -137,7 +139,8 @@ double calculate_matrix_element(struct params & my_params,int L){
                 value2=angular_term * (-my_params.scalar_p[L][i] + my_params.vector_p[L][i]) * my_params.f1[i] * my_params.f2[i] / hbarc;
                 y4.push_back(value1+value2);
             }
-            E3 = simps(y4,fx);
+            // E3 = simps(y4,fx);
+            E3 = my_spline(y4, fx, my_tolerance).integral();
             y4.clear();
         }
         return E3;

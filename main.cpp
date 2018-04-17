@@ -195,16 +195,17 @@ int main(int argc, char ** argv){
         /* Form the densities */
         generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states, density.h
         
-        // if(ite > 0){
-        //     for(int i = 0; i < max_L; i++){
-        //         for(int j = 0; j < N; j++){
-        //             dens[i][j] = 2.0/3 * dens_old[i][j] + 1.0/3 * dens[i][j];
-        //             denv[i][j] = 2.0/3 * denv_old[i][j] + 1.0/3 * denv[i][j];
-        //             den3[i][j] = 2.0/3 * den3_old[i][j] + 1.0/3 * den3[i][j];
-        //             denp[i][j] = 2.0/3 * denp_old[i][j] + 1.0/3 * denp[i][j];
-        //         }
-        //     }
-        // }
+//        if(ite > 0){
+//            for(int i = 0; i < max_L; i++){
+//                 for(int j = 0; j < N; j++){
+//                     dens[i][j] = 3./4 * dens_old[i][j] + 1.0/4 * dens[i][j];
+//                     denv[i][j] = 3./4 * denv_old[i][j] + 1.0/4 * denv[i][j];
+//                     den3[i][j] = 3./4 * den3_old[i][j] + 1.0/4 * den3[i][j];
+//                     denp[i][j] = 3./4 * denp_old[i][j] + 1.0/4 * denp[i][j];
+//                 }
+//             }
+//         }
+        
         dens_old = dens;
         denv_old = denv;
         den3_old = den3;
@@ -222,16 +223,34 @@ int main(int argc, char ** argv){
         cout<<occp.size()<<' '<<occn.size()<<endl;
         
         /* output the energy*/
-        for(int ii = 0; ii < 1; ii ++){
-            eig2 test = occp[ii];
-            Solution temp = Solution(test);
-            cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
-        }
-        for(int ii = 0; ii < 1; ii ++){
-            eig2 test = occn[ii];
-            Solution temp = Solution(test);
-            cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
-        }
+        // for(int ii = 0; ii < occp.size(); ii ++){
+        //     eig2 test = occp[ii];
+        //     Solution temp = Solution(test);
+        //     cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        //     temp.print_eigenvectors();
+        // }
+        // for(int ii = 0; ii < occn.size(); ii ++){
+        //     eig2 test = occn[ii];
+        //     Solution temp = Solution(test);
+        //     cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
+        //     temp.print_eigenvectors();
+
+        // }
+        
+        
+        // for(int i = 0 ;i < max_L; i++){
+        //     ofstream outfile;
+        //     ofstream outfile2;
+        //     outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".txt");
+        //     outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
+        //     for(int j = 0; j < N; j++){
+        //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+        //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+        //     }
+        //     outfile.close();
+        //     outfile2.close();
+        // }
+        
         
         /*get energy*/
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
@@ -242,18 +261,18 @@ int main(int argc, char ** argv){
     
     /* option part ,
      output all the potentials and densities */
-     for(int i = 0 ;i < max_L; i++){
-         ofstream outfile;
-         ofstream outfile2;
-         outfile.open("density" + to_string(i) + ".txt");
-         outfile2.open("potential" + to_string(i) + ".txt");
-         for(int j = 0; j < N; j++){
-             outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-             outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-         }
-         outfile.close();
-         outfile2.close();
-     }
+//     for(int i = 0 ;i < max_L; i++){
+//         ofstream outfile;
+//         ofstream outfile2;
+//         outfile.open("density" + to_string(i) + ".txt");
+//         outfile2.open("potential" + to_string(i) + ".txt");
+//         for(int j = 0; j < N; j++){
+//             outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+//             outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+//         }
+//         outfile.close();
+//         outfile2.close();
+//     }
 //   if (max_L > 1){
 //       ofstream outfile;
 //       outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
