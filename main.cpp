@@ -218,7 +218,7 @@ int main(int argc, char ** argv){
          update the potentials*/
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int i = 0; i < max_L; i++)
-            cout <<"channel="<<i<<':'<< Phi[i][0] <<' '<< W[i][0]<<' '<<B[i][0]<<' '<<A[i][0]<<endl;
+            cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
         

@@ -9,6 +9,87 @@
 #ifndef Green_method_h
 #define Green_method_h
 #include "integrator.h"
+#include "Bessel.h"
+#include <thread>
+#include <chrono>
+using namespace std;
+
+double klein2(double mass, vector<double> density, int index, int L, my_spline & riccatijIs){
+    double r;
+    r = fx[index];
+    double coef = 1/(mass*r);
+    vector<double> inte1, inte2, fx1, fx2;
+    for(int i = 0; i < index + 1;i ++){
+        double a, b;
+        if (i == 0){
+            a = 0;
+            b = 0;
+        }
+        else if((fx[i]*mass)< 1){
+            a = riccatijIs.eval(fx[i]*mass);
+            b = riccatihI(L, r*mass);
+        }
+        else{
+            a = riccatijI(L, fx[i]*mass);
+            b = riccatihI(L, r*mass);
+        }
+        if((L % 2) == 0)
+            inte1.push_back(-a*b*fx[i]*density[i]);
+        else
+            inte1.push_back(a*b*fx[i]*density[i]);
+        fx1.push_back(fx[i]);
+    }
+    for(int i = index; i < N; i++){
+        double a, b;
+        if(r*mass < 1){
+            a = riccatijIs.eval(r*mass);
+            b = riccatihI(L, fx[i]*mass);
+        }
+        else{
+            a = riccatijI(L, r*mass);
+            b = riccatihI(L, fx[i]*mass);
+        }
+
+        if((L % 2) == 0)
+            inte2.push_back(-a*b*fx[i]*density[i]);
+        else
+            inte2.push_back(a*b*fx[i]*density[i]);
+        fx2.push_back(fx[i]);
+    }
+
+    if(fx1.size()==2){
+        double manual_spline_y = 0.5*(inte1[0] + inte1[1]);
+        double manual_spline_x = 0.5*(fx1[0] + fx1[1]);
+        fx1.insert(fx1.begin()+1, manual_spline_x);
+        inte1.insert(inte1.begin()+1, manual_spline_y);
+    }
+    if(fx2.size()==2){
+        double manual_spline_y = 0.5*(inte2[0]+inte2[1]);
+        double manual_spline_x = 0.5*(fx2[0]+fx2[1]);
+        fx2.insert(fx2.begin()+1,manual_spline_x);
+        inte2.insert(inte2.begin()+1,manual_spline_y);
+    }
+
+    // cout << mass << ' '  << index << ' ' << fx2[0] << ' ' << inte2[0]*coef << ' ' << density[index] << endl;
+
+    // for(int i = 0; i < fx[1].size; i++){
+    // 	cout << 
+    // }
+
+
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
+    if(fx2.size() == 1){
+        return coef*my_spline(inte1,fx1,my_tolerance).integral();
+    }
+    else{
+        return coef*(my_spline(inte1,fx1,my_tolerance).integral() + my_spline(inte2,fx2,my_tolerance).integral());
+    }
+
+
+
+}
+
 
 
 
@@ -42,6 +123,10 @@ double klein(double mass,vector<double> density,int index){
         fx2.insert(fx2.begin()+1, manual_spline_x);
         inte2.insert(inte2.begin()+1, manual_spline_y);
     }
+
+    // cout << mass << ' '  << index << ' ' << fx2[0] << ' ' << coef1*coef3*inte2[0] << ' ' << density[index] << endl;
+    // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+
     if(fx2.size()==1)   //the second part of the integral is essentially zero
         return coef1*(coef2*my_spline(inte1,fx1,my_tolerance).integral());
     else
