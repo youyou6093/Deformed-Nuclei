@@ -23,7 +23,7 @@
 #include <algorithm>
 using namespace std;
 #define MAX_KAPPA 7
-#define ITENUM 60
+#define ITENUM 200
 
 /*--------------------set up global varialbes-----------------------------*/
 
@@ -153,7 +153,7 @@ int main(int argc, char ** argv){
         //     	Potential[i] = 0.0;
         // }
         for(int i=0;i<N;i++)
-        	Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI) * exp(- 0.4 * fx[i]);
+        	Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
 
         // * exp(- 0.4 * fx[i])
         /*Every iteration it updates the meson potentials
