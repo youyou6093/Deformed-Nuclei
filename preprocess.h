@@ -156,7 +156,7 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
         }
         else{
             for( int i =0; i < N; i++){
-                vector_p[L][i] -= Potential[i];
+                vector_p[L][i] += Potential[i];
             }
         }
     }

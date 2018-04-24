@@ -238,18 +238,21 @@ int main(int argc, char ** argv){
         // }
         
         
-        // for(int i = 0 ;i < max_L; i++){
-        //     ofstream outfile;
-        //     ofstream outfile2;
-        //     outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".txt");
-        //     outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
-        //     for(int j = 0; j < N; j++){
-        //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-        //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-        //     }
-        //     outfile.close();
-        //     outfile2.close();
-        // }
+        for(int i = 0 ;i < max_L; i++){
+            if((ite % 5) == 0){
+
+            ofstream outfile;
+            ofstream outfile2;
+            outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".txt");
+            // outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
+            for(int j = 0; j < N; j++){
+                outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+                // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+            }
+            outfile.close();
+            outfile2.close();
+        }
+        }
         
         
         /*get energy*/

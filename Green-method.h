@@ -18,42 +18,51 @@ double klein2(double mass, vector<double> density, int index, int L, my_spline &
     double r;
     r = fx[index]; //the point that I want to know the potential
     double coef = 1/(mass*r);
+    double coef1,coef2;
     vector<double> inte1, inte2, fx1, fx2;
+    coef1 = riccatihI(L, r * mass);
+    if(r * mass < 1){
+        coef2 = riccatijIs.eval(r*mass);
+    }
+    else{
+        coef2 = riccatijI(L, r*mass);
+    }
+
     for(int i = 0; i < index + 1;i ++){  //left half
-        double a, b;
+        double a;
         if (i == 0){
             a = 0;
-            b = 0;
+            // b = 0;
         }
         else if((fx[i]*mass)< 1){
             a = riccatijIs.eval(fx[i]*mass);       //evaluate j^(imx')
-            b = riccatihI(L, r*mass);			   //evaluate h^(imx)	
+            // b = riccatihI(L, r*mass);			   //evaluate h^(imx)	
         }
         else{
             a = riccatijI(L, fx[i]*mass);         
-            b = riccatihI(L, r*mass);
+            // b = riccatihI(L, r*mass);
         }
         if((L % 2) == 0)   //need an extra minus because the even channels are imaginary
-            inte1.push_back(-a*b*fx[i]*density[i]); //the left integral
+            inte1.push_back(-a*coef1*fx[i]*density[i]); //the left integral
         else
-            inte1.push_back(a*b*fx[i]*density[i]);
+            inte1.push_back(a*coef1*fx[i]*density[i]);
         fx1.push_back(fx[i]);
     }
     for(int i = index; i < N; i++){
-        double a, b;
+        double a;
         if(r*mass < 1){
-            a = riccatijIs.eval(r*mass);         //evaluate j^(imx)
-            b = riccatihI(L, fx[i]*mass);		 //evaluate h^(imx')
+            // a = riccatijIs.eval(r*mass);         //evaluate j^(imx)
+            a = riccatihI(L, fx[i]*mass);		 //evaluate h^(imx')
         }
         else{
-            a = riccatijI(L, r*mass);
-            b = riccatihI(L, fx[i]*mass);
+            // a = riccatijI(L, r*mass);
+            a = riccatihI(L, fx[i]*mass);
         }
 
         if((L % 2) == 0)
-            inte2.push_back(-a*b*fx[i]*density[i]);
+            inte2.push_back(-coef2*a*fx[i]*density[i]);
         else
-            inte2.push_back(a*b*fx[i]*density[i]);
+            inte2.push_back(coef2*a*fx[i]*density[i]);
         fx2.push_back(fx[i]);
     }
 
