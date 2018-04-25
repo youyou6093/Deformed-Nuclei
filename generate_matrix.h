@@ -86,7 +86,8 @@ string generate_key(double m,int k1,int k2,int L){
 /* A struct that stores the params*/
 struct params{
     int n1,n2,k1,k2,s1,s2;
-    vector<double>g1,g2,f1,f2;
+    vector<double> g1,g2,f1,f2;
+//    double *g1;
     int m;
     double diag_energy;
     vector<vector<double>> scalar_p,vector_p;
@@ -174,6 +175,7 @@ void generate_matrix(vector<vector<double>> &M,vector<vector<double>> &scalar_po
     
     
     States_ptr=States_map.find(states[i].key);
+//    my_params.g1=&(States_ptr->second[0][0]);
     my_params.g1=States_ptr->second[0];
     my_params.f1=States_ptr->second[1];
     States_ptr=States_map.find(states[j].key);
