@@ -99,7 +99,9 @@ struct params{
 double calculate_matrix_element(struct params & my_params,int L){
     double value1,value2,angular_term,value3;
     double E1,E2,E3;
-    vector<double> y1,y2,y3,y4,y5;
+//    vector<double> y1,y2,y3,y4,y5;
+    double *y4 = new double[N];
+//    vector<double> y4(N,0.0);
     /*The spherical symmetric potential part*/
     if (L==0){
         /*Diagonal part*/
@@ -114,15 +116,18 @@ double calculate_matrix_element(struct params & my_params,int L){
                 value1=(my_params.scalar_p[L][i]+my_params.vector_p[L][i])*my_params.g1[i]*my_params.g2[i]/hbarc;
                 value2=(-my_params.scalar_p[L][i]+my_params.vector_p[L][i])*my_params.f1[i]*my_params.f2[i]/hbarc;
                 value3=-(1/pow(b,2))*(my_params.g1[i]*my_params.f2[i]+my_params.g2[i]*my_params.f1[i])*fx[i];
-                y3.push_back(value1+value2+value3);
+//                y3.push_back(value1+value2+value3);
+                y4[i] = value1+value2+value3;
             }
-            E2=simps(y3,fx);
+            E2=simps(y4,&(fx[0]),N);
             // E2 = my_spline(y3, fx, my_tolerance).integral();
-            y3.clear();
+//            y3.clear();
         }
         else
             E2=0.0;
-        return E1+E2;
+//        delete [] y4;
+//        return E1+E2;
+        E3 = E1 + E2;
     }
     
     /*The deformed part where kappa is not a good quantum number*/
@@ -137,14 +142,16 @@ double calculate_matrix_element(struct params & my_params,int L){
                 /* Radial part of the integral*/
                 value1=angular_term * (my_params.scalar_p[L][i] + my_params.vector_p[L][i]) * my_params.g1[i] * my_params.g2[i] / hbarc;
                 value2=angular_term * (-my_params.scalar_p[L][i] + my_params.vector_p[L][i]) * my_params.f1[i] * my_params.f2[i] / hbarc;
-                y4.push_back(value1+value2);
+//                y4.push_back(value1+value2);
+                y4[i] = value1+value2;
             }
-            E3 = simps(y4,fx);
+            E3 = simps(y4,&(fx[0]),N);
             // E3 = my_spline(y4, fx, my_tolerance).integral();
-            y4.clear();
+//            y4.clear();
         }
-        return E3;
     }
+    delete [] y4;
+    return E3;
 }
 
 
@@ -190,6 +197,7 @@ void generate_matrix(vector<vector<double>> &M,vector<vector<double>> &scalar_po
 vector<vector<double>> generate_full_matrix(vector<vector<double>> &scalar_potential,vector<vector<double>> & vector_potential,vector<State> &states,int m){
     int matrix_size=int(states.size());
     vector<vector<double>> M(matrix_size,vector<double>(matrix_size,0.0));
+#pragma omp parallel for
     for(int i=0;i<states.size();i++){
         for(int j=i;j<states.size();j++){   //this is half of the matrix
             generate_matrix(M, scalar_potential, vector_potential, states, m, i, j);

@@ -94,12 +94,13 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
     po2=multiplication(B2, W);
     po3=multiplication(Phi2, B);
     po4=multiplication(W2, B);
-    
+    double h3 = hbarc * hbarc * hbarc;
+    double h2 = hbarc * hbarc;
     for(int i=0;i<max_L;i++){
         for(int j=0;j<N;j++){
-            EFF_Phi[i][j] = dens[i][j] + 2*lambdas*po1[i][j]/pow(hbarc,3)-(lambda/6.0)*Phi3[i][j]/pow(hbarc,3)-(ka/2.0)*Phi2[i][j]/pow(hbarc,2);
-            EFF_W[i][j] = denv[i][j] - 2*lambdav*po2[i][j]/pow(hbarc,3) - (ks/6.0)*W3[i][j]/pow(hbarc,3);
-            EFF_B[i][j] = 0.5*(den3[i][j] - 4*lambdas*po3[i][j]/pow(hbarc,3) - 4*lambdav*po4[i][j]/pow(hbarc,3));
+            EFF_Phi[i][j] = dens[i][j] + 2*lambdas*po1[i][j]/h3-(lambda/6.0)*Phi3[i][j]/h3-(ka/2.0)*Phi2[i][j]/h2;
+            EFF_W[i][j] = denv[i][j] - 2*lambdav*po2[i][j]/h3 - (ks/6.0)*W3[i][j]/h3;
+            EFF_B[i][j] = 0.5*(den3[i][j] - 4*lambdas*po3[i][j]/h3 - 4*lambdav*po4[i][j]/h3);
         }
     }
     
@@ -124,7 +125,7 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     my_spline riccatijIs = my_spline(ydata, xdata, 0.001);
 
 
-    
+#pragma omp parallel for
     for(int i=1;i<N;i++){
        // Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein(ms,  EFF_Phi[L] , i)/3.0; //not sure whether I can just put gs outside
        // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein(mv, EFF_W[L], i)/3.0;
