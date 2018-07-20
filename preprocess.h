@@ -111,9 +111,9 @@ void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vect
     
     
     /*for test purpose, make an guess at the beginning*/
-    for(int i = 0; i < N; i ++){
-        Phi[1][i] = -200 * Deformation_parameter * fx[i] * fx[i] * exp(-fx[i]);
-    }
+//    for(int i = 0; i < N; i ++){
+//        Phi[1][i] = -200 * Deformation_parameter * fx[i] * fx[i] * exp(-fx[i]);
+//    }
 }
 
 

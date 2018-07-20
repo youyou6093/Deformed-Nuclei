@@ -93,7 +93,7 @@ public:
     void compute_one_(int a,int b,int num){
         Solution x=solution[num];      //one of the occ state
         int m=x.m;                     //get m
-        double coef,coef2;             //coef is the A(m,k1,k2,L) in my calculations
+        double coef;             //coef is the A(m,k1,k2,L) in my calculations
         vector<int> kappas=x.kappas;   //all Kappa in this occ state
         int k1=x.wavefunctions[a].kappa;        // the first kappa of this state
         int k2=x.wavefunctions[b].kappa;        // the second kappa of this state

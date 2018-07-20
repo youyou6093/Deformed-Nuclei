@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		7818D34F208F92E50083EF3B /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7818D34E208F92E50083EF3B /* main.cpp */; };
 		7818D35E208F93570083EF3B /* states.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7818D35C208F93570083EF3B /* states.cpp */; };
+		788CEAB021028B9D00336E72 /* RacahFunctions.o in Frameworks */ = {isa = PBXBuildFile; fileRef = 788CEAAF21028B9D00336E72 /* RacahFunctions.o */; };
+		788CEAB121028D6F00336E72 /* libgsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 788CEAA72102896F00336E72 /* libgsl.a */; };
+		788CEAB221028D7300336E72 /* libgslcblas.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 788CEAA92102899200336E72 /* libgslcblas.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +46,11 @@
 		7818D35F208F936A0083EF3B /* HOStuff.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HOStuff.h; sourceTree = SOURCE_ROOT; };
 		7818D360208F936B0083EF3B /* simps.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = simps.h; sourceTree = SOURCE_ROOT; };
 		7818D361208F936B0083EF3B /* symm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = symm.h; sourceTree = SOURCE_ROOT; };
+		788CEAA72102896F00336E72 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../usr/local/lib/libgsl.a; sourceTree = "<group>"; };
+		788CEAA92102899200336E72 /* libgslcblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgslcblas.a; path = ../../../../../usr/local/lib/libgslcblas.a; sourceTree = "<group>"; };
+		788CEAAB21028A8200336E72 /* libgsl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgsl.a; path = ../../../../../usr/local/Cellar/gsl/1.16/lib/libgsl.a; sourceTree = "<group>"; };
+		788CEAAD21028A8500336E72 /* libgslcblas.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgslcblas.a; path = ../../../../../usr/local/Cellar/gsl/1.16/lib/libgslcblas.a; sourceTree = "<group>"; };
+		788CEAAF21028B9D00336E72 /* RacahFunctions.o */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.objfile"; path = RacahFunctions.o; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -50,6 +58,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				788CEAB021028B9D00336E72 /* RacahFunctions.o in Frameworks */,
+				788CEAB121028D6F00336E72 /* libgsl.a in Frameworks */,
+				788CEAB221028D7300336E72 /* libgslcblas.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -61,6 +72,7 @@
 			children = (
 				7818D346208F92590083EF3B /* Deform_test */,
 				7818D345208F92590083EF3B /* Products */,
+				788CEAA62102896F00336E72 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -95,6 +107,18 @@
 				7818D358208F933E0083EF3B /* integrator.h */,
 			);
 			path = Deform_test;
+			sourceTree = "<group>";
+		};
+		788CEAA62102896F00336E72 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				788CEAAF21028B9D00336E72 /* RacahFunctions.o */,
+				788CEAAD21028A8500336E72 /* libgslcblas.a */,
+				788CEAAB21028A8200336E72 /* libgsl.a */,
+				788CEAA92102899200336E72 /* libgslcblas.a */,
+				788CEAA72102896F00336E72 /* libgsl.a */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -269,6 +293,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -277,6 +307,12 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				HEADER_SEARCH_PATHS = /usr/local/include/;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					/usr/local/lib/,
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

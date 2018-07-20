@@ -100,18 +100,25 @@ int main(int argc, char ** argv){
     vector<vector<double>> scalar_p,vector_p,scalar_n,vector_n;
     vector<double> Potential,flat; //flat is the flatted matrix
     vector<State> States_m;        //the basis quantum number of a specific m
-    matrix_diag diag = matrix_diag();      //diagnolization class
+//    matrix_diag diag = matrix_diag();      //diagnolization class
     vector<eig2> occp,occn;        //occupied states of protons and neutrons
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;
 
     //Command line part
-    proton_number = atoi(argv[1]);
-    neutron_number = atoi(argv[2]);
-    Deformation_parameter = stod(argv[3]);
-    max_L = atoi(argv[4]);
-    max_k = atoi(argv[5]);
-    itenum = atoi(argv[6]);
+//    proton_number = atoi(argv[1]);
+//    neutron_number = atoi(argv[2]);
+//    Deformation_parameter = stod(argv[3]);
+//    max_L = atoi(argv[4]);
+//    max_k = atoi(argv[5]);
+//    itenum = atoi(argv[6]);
+    
+    proton_number = 20;
+    neutron_number = 20;
+    Deformation_parameter = 0;
+    max_L = 1;
+    max_k = 7;
+    itenum = 50;
 
     preprocessing();                    //Prepare the states Hash Map
     /*initialize the PHI W B A potential
@@ -171,10 +178,13 @@ int main(int argc, char ** argv){
             States_m=generate_statesm(m, max_L);        //States for this m
 //            cout << "States number is : " << States_m.size() << endl;
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);
+//            vector<vector<double>> M(States_m.size(), vector<double>(States_m.size(), 0.0));
+//            for(int i = 0; i < States_m.size(); i++)
+//                M[i][i] = 1;
             if (M.size()!=States_m.size()) cout<<"Error!!"<<endl;
             flat=flat_matrix(M);
             /*diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix*/
-            diag=matrix_diag(flat,int(States_m.size()));
+            matrix_diag diag = matrix_diag(flat,int(States_m.size()));
             diag.get_results();
             /*diag.results is a matrix full of eigvalues and eigenvectors.
               I need to add m to the result to form the basis*/
@@ -217,12 +227,14 @@ int main(int argc, char ** argv){
             cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
         
         /* a new test*/
-        int min_index;
+        int min_index = -1;
         double min_dens = 10;
-        for(int i =0; i < N; i ++){
-            if (denv[1][i] < min_dens){
-                min_dens = denv[1][i];
-                min_index = i;
+        if(max_L > 1){
+            for(int i =0; i < N; i ++){
+                if (denv[1][i] < min_dens){
+                    min_dens = denv[1][i];
+                    min_index = i;
+                }
             }
         }
         
@@ -230,13 +242,15 @@ int main(int argc, char ** argv){
         /* compute the effective density
          solve the klein-gordon equation
          update the potentials*/
+        
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
+        
         for(int i = 0; i < max_L; i++)
             cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
         
-
+        
         cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
         oldmin = min_dens;
         /* output the energy*/

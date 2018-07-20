@@ -6,7 +6,7 @@
 using namespace std;
 
 vector<vector<double>> runge_forward(double x0,double y0,double z0,double h,int Numbers,int l,double (*f)(double, double, double, int)){
-    vector<vector<double>> ret(3, vector<double>(Numbers, 0.0));
+    vector<vector<double>> ret(3, vector<double>(Numbers + 1, 0.0));
     ret[0][0] = x0;
     ret[1][0] = y0;
     ret[2][0] = z0;

@@ -89,7 +89,7 @@ public:
         
         double r = rmin;
         double h = (rmax-rmin)/(N-1.);
-        double fourpi = 4 * M_PI;
+//        double fourpi = 4 * M_PI;
         R.resize(N,0);
         dR.resize(N,0);
         

@@ -158,6 +158,7 @@ vector<vector<double>> NormalizedRiccatijI(double h, int Numbers, int l){
     vector<double> initvector = initbesselI(h,l);
     vector<vector<double>> ret = runge_forward(initvector[0],initvector[1],initvector[2],h,Numbers,l,friccatijI);
     double norm = riccatijI(l, ret[0][Numbers])/ret[1][Numbers];
+//    cout << "norm" << norm << endl;
     for(int i = 0; i<= Numbers;i++){
         ret[1][i] = ret[1][i] * norm;
     }

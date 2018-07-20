@@ -14,7 +14,7 @@
 #include <chrono>
 using namespace std;
 
-double klein2(double mass, vector<double> density, int index, int L, my_spline & riccatijIs, vector<vector<double>> JIs, vector<vector<double>> HIs, int type){
+double klein2(double mass, vector<double> &density, int index, int L, my_spline & riccatijIs, vector<vector<double>> &JIs, vector<vector<double>> &HIs, int type){
     double r;
     r = fx[index]; //the point that I want to know the potential
     double coef = 1/(mass*r);
@@ -51,7 +51,7 @@ double klein2(double mass, vector<double> density, int index, int L, my_spline &
         fx1.push_back(fx[i]);
     }
     for(int i = index; i < N; i++){
-        double a;
+//        double a;
 //        if(r*mass < 1){
 //            // a = riccatijIs.eval(r*mass);         //evaluate j^(imx)
 //            a = riccatihI(L, fx[i]*mass);         //evaluate h^(imx')
@@ -104,7 +104,7 @@ double klein2(double mass, vector<double> density, int index, int L, my_spline &
 }
 
 /*need more checking*/
-double poisson(vector<double> density, int index, int L){
+double poisson(vector<double> &density, int index, int L){
     double r = fx[index];
     double coef = 1/(2*L+1.);
     vector<double> inte1,inte2,fx1,fx2;
@@ -140,7 +140,7 @@ double poisson(vector<double> density, int index, int L){
     
 }
 
-double klein(double mass,vector<double> density,int index){
+double klein(double mass,vector<double> &density,int index){
     double r,coef1,coef2,coef3,temp1,temp2;
     vector<double> inte1,inte2,fx1,fx2;
     r=fx[index];

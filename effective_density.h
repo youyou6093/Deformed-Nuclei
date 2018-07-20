@@ -117,7 +117,7 @@ void Get_bessels(int type, my_spline & riccatijIs, vector<vector<double>> &JIs, 
     else if(type == 1){
         m = mv;
     }
-    else if(type == 2){
+    else{
         m = mp;
     }
     for(int i = 1; i < N; i++){
@@ -131,6 +131,10 @@ void Get_bessels(int type, my_spline & riccatijIs, vector<vector<double>> &JIs, 
     }
     JIs[type][0] = 0.0;
     HIs[type][0] = 0.0;
+//    vector<double> test = fx;
+    
+//    cout << fx[100] * m << ' ' << JIs[type][100] << endl;
+    
 }
 
 
@@ -143,8 +147,8 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
                    int L){
     
     //get hl^ and jl^ based 
-    double h_bessel = 0.001;
-    int Numbers = 1000;
+    double h_bessel = 0.0001;
+    int Numbers = 10000;
     vector<vector<double>> ret = NormalizedRiccatijI(h_bessel, Numbers, L);
     vector<double> ydata(Numbers + 1, 0.0);
     vector<double> xdata(Numbers + 1, 0.0);
@@ -152,14 +156,19 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     	ydata[i] = ret[1][i];
     	xdata[i] = ret[0][i];
     }
+//    cout << xdata[0] << ' ' << xdata[Numbers-1] << endl;
     my_spline riccatijIs = my_spline(ydata, xdata, 0.001);
-    
+//    for(int i = 0; i < 10; i++)
+//        cout << ydata[i] << endl;
     // precompute all the bessel functions
     vector<vector<double>> JIs(3, vector<double>(N, 0.0)), HIs(3, vector<double>(N, 0.0));
     Get_bessels(0, riccatijIs, JIs, HIs, L);
     Get_bessels(1, riccatijIs, JIs, HIs, L);
     Get_bessels(2, riccatijIs, JIs, HIs, L);
-
+//    for(int i = 0; i < 10; i++){
+//        cout << JIs[0][1] << ' '  << HIs[0][1] << endl;
+////        cout << 1 << endl;
+//    }
     
 #pragma omp parallel for
     
@@ -187,11 +196,13 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
 //        B[L][i] =  hbarc * gp * klein(mp , EFF_B[L], i);
 //        A[L][i] = hbarc * gg * klein(mg, denp[L], i);
     }
+//    vector<vector<double>> test = Phi;
+    
     Phi[L][0] = Phi[L][1];
     W[L][0] = W[L][1];
     B[L][0] = B[L][1];
     A[L][0] = A[L][1];
-    
+//    vector<vector<double>> test = Phi;
     
     
 }

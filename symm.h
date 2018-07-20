@@ -30,12 +30,12 @@ bool compare_eig(eig a,eig b){
 
 class matrix_diag{
 private:
-    double *m_array;             //1d array
+    double *m_array = NULL;             //1d array
     //--------------------------------------
     gsl_matrix_view m;             //gsl matrix
     gsl_vector *eval = NULL;              //eigenvalues later
     gsl_matrix *evec = NULL;              //eigenvectors later
-    gsl_eigen_symmv_workspace * w;
+    gsl_eigen_symmv_workspace * w = NULL;
     //-----------------------------------------
     
     void diagonalize(){
@@ -52,22 +52,25 @@ private:
 public:
     
     vector<eig> results;         //eigenvalues eigenvectors.
-    double size;                 //size of the matrix(not total size, just the dimension of the matrix)
+    int size;                 //size of the matrix(not total size, just the dimension of the matrix)
     
     ~matrix_diag(){              //destructor
         gsl_vector_free(eval);
         gsl_matrix_free(evec);
+//        cout << "freeing" << endl;
     }
     
     void get_results(){             //get eigenvalues-eigenvectors pair(real part)
+        results.clear();
         diagonalize();              //diagnolize the matrix
         eig temp;                   //stores a pair of eigenvalues and eigenvectors
         for(int i=0;i<size;i++){
-            double eval_i=gsl_vector_get(eval,i);                   //get ith eigenvalues
-            gsl_vector_view evec_i=gsl_matrix_column(evec,i);       //get ith eigenvectors
-            temp.eigen_values=eval_i;                               //store eigenvalues
+//            double eval_i=gsl_vector_get(eval,i);                   //get ith eigenvalues
+//            gsl_vector_view evec_i=gsl_matrix_column(evec,i);       //get ith eigenvectors
+            temp.eigen_values=eval->data[i];                               //store eigenvalues
             for(int j=0;j<size;j++){
-                double x = gsl_vector_get(&evec_i.vector,j);
+//                double x = gsl_vector_get(&evec_i.vector,j);
+                double x = evec->data[i + j * size];
                 temp.eigen_vectors.push_back(x);                   //store ith eigenvectors,
                                                                    //jth values
             }
@@ -82,14 +85,14 @@ public:
         size=0;
     }
     
-    matrix_diag(double *data,double n){    //initialize the matrix from array
-        //pass by reference,will change data itself
-        m_array=data;
-        size=n;
-    }
+//    matrix_diag(double *data,double n){    //initialize the matrix from array
+//        //pass by reference,will change data itself
+//        m_array=data;
+//        size=n;
+//    }
     
     
-    matrix_diag(vector<double> &data,double n){           //it is very important to pass by reference!!!
+    matrix_diag(vector<double> &data,int n){           //it is very important to pass by reference!!!
         m_array=&(data[0]);
         size=n;
     }

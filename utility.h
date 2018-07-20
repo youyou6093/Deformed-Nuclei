@@ -72,7 +72,7 @@ int magic(int n){
     a.push_back(-2);
     a.push_back(+1);
     a.push_back(-7);
-    int k;
+    int k = -1;
     for(int i=0;i<30;i++){
         n-=2*abs(a[i]);
         if(n<=0){
