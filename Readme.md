@@ -298,18 +298,12 @@ Result is not good.
 ## Nov 22
 The calculations of the matrix element is verifyed
 
+## Jun 1st
+1. Added parallel
 
+2. Fixed the KG equation and the Possion Equation
 
-#### maybe the way I generate the angular dependence is wrong, change the check function.
-#### add threads
-
-
-## Checklist:
-
-1.The basis I choose is complete
-2.Check Get Solution
-3.Check get density
-4.Check update Potential
+3. Current problems, not converge, the shape remains the same
 
 
 

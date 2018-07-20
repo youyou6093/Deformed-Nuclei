@@ -106,6 +106,36 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
     
 }
 
+
+
+//get the riccatijI
+void Get_bessels(int type, my_spline & riccatijIs, vector<vector<double>> &JIs, vector<vector<double>> &HIs, int L){
+    double m;
+    if(type == 0){
+        m = ms;
+    }
+    else if(type == 1){
+        m = mv;
+    }
+    else if(type == 2){
+        m = mp;
+    }
+    for(int i = 1; i < N; i++){
+        if ((fx[i] * m) < 1){
+            JIs[type][i] = riccatijIs.eval(fx[i] * m);
+        }
+        else{
+            JIs[type][i] = riccatijI(L, fx[i] * m);
+        }
+        HIs[type][i] = riccatihI(L, fx[i] * m);
+    }
+    JIs[type][0] = 0.0;
+    HIs[type][0] = 0.0;
+}
+
+
+
+
 /* Sloving the Klein-Gordon Equation*/
 void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,
                    vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,
@@ -123,9 +153,17 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     	xdata[i] = ret[0][i];
     }
     my_spline riccatijIs = my_spline(ydata, xdata, 0.001);
+    
+    // precompute all the bessel functions
+    vector<vector<double>> JIs(3, vector<double>(N, 0.0)), HIs(3, vector<double>(N, 0.0));
+    Get_bessels(0, riccatijIs, JIs, HIs, L);
+    Get_bessels(1, riccatijIs, JIs, HIs, L);
+    Get_bessels(2, riccatijIs, JIs, HIs, L);
 
-
+    
 #pragma omp parallel for
+    
+    
     for(int i=1;i<N;i++){
        // Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein(ms,  EFF_Phi[L] , i)/3.0; //not sure whether I can just put gs outside
        // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein(mv, EFF_W[L], i)/3.0;
@@ -138,11 +176,11 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
          // B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs)/3.0;
          // A[L][i] = hbarc * gg * poisson(denp[L], i, L);
 
-         Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs); //not sure whether I can just put gs outside
-         W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs);
-         B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs);
+         Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
+         W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
+         B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
          A[L][i] = hbarc * gg * poisson(denp[L], i, L);
-
+        
         
 //        Phi[L][i] =   hbarc * gs * klein(ms,  EFF_Phi[L] , i); //not sure whether I can just put gs outside
 //        W[L][i] =    hbarc * gv * klein(mv, EFF_W[L], i);

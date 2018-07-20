@@ -14,7 +14,7 @@
 #include <chrono>
 using namespace std;
 
-double klein2(double mass, vector<double> density, int index, int L, my_spline & riccatijIs){
+double klein2(double mass, vector<double> density, int index, int L, my_spline & riccatijIs, vector<vector<double>> JIs, vector<vector<double>> HIs, int type){
     double r;
     r = fx[index]; //the point that I want to know the potential
     double coef = 1/(mass*r);
@@ -29,40 +29,42 @@ double klein2(double mass, vector<double> density, int index, int L, my_spline &
     }
 
     for(int i = 0; i < index + 1;i ++){  //left half
-        double a;
-        if (i == 0){
-            a = 0;
-            // b = 0;
-        }
-        else if((fx[i]*mass)< 1){
-            a = riccatijIs.eval(fx[i]*mass);       //evaluate j^(imx')
-            // b = riccatihI(L, r*mass);			   //evaluate h^(imx)	
-        }
-        else{
-            a = riccatijI(L, fx[i]*mass);         
-            // b = riccatihI(L, r*mass);
-        }
+//        double a;
+//        if (i == 0){
+//            a = 0;
+//            // b = 0;
+//        }
+//        else if((fx[i]*mass)< 1){
+//            a = riccatijIs.eval(fx[i]*mass);       //evaluate j^(imx')
+//            // b = riccatihI(L, r*mass);               //evaluate h^(imx)
+//        }
+//        else{
+//            a = riccatijI(L, fx[i]*mass);
+//            // b = riccatihI(L, r*mass);
+//        }
+        
+        
         if((L % 2) == 0)   //need an extra minus because the even channels are imaginary
-            inte1.push_back(-a*coef1*fx[i]*density[i]); //the left integral
+            inte1.push_back(-JIs[type][i]*coef1*fx[i]*density[i]); //the left integral
         else
-            inte1.push_back(a*coef1*fx[i]*density[i]);
+            inte1.push_back(JIs[type][i]*coef1*fx[i]*density[i]);
         fx1.push_back(fx[i]);
     }
     for(int i = index; i < N; i++){
         double a;
-        if(r*mass < 1){
-            // a = riccatijIs.eval(r*mass);         //evaluate j^(imx)
-            a = riccatihI(L, fx[i]*mass);		 //evaluate h^(imx')
-        }
-        else{
-            // a = riccatijI(L, r*mass);
-            a = riccatihI(L, fx[i]*mass);
-        }
+//        if(r*mass < 1){
+//            // a = riccatijIs.eval(r*mass);         //evaluate j^(imx)
+//            a = riccatihI(L, fx[i]*mass);         //evaluate h^(imx')
+//        }
+//        else{
+//            // a = riccatijI(L, r*mass);
+//            a = riccatihI(L, fx[i]*mass);
+//        }
 
         if((L % 2) == 0)
-            inte2.push_back(-coef2*a*fx[i]*density[i]);
+            inte2.push_back(-coef2*HIs[type][i]*fx[i]*density[i]);
         else
-            inte2.push_back(coef2*a*fx[i]*density[i]);
+            inte2.push_back(coef2*HIs[type][i]*fx[i]*density[i]);
         fx2.push_back(fx[i]);
     }
 

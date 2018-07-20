@@ -108,6 +108,12 @@ void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vect
         B.push_back(empty);
         A.push_back(empty);
     }
+    
+    
+    /*for test purpose, make an guess at the beginning*/
+    for(int i = 0; i < N; i ++){
+        Phi[1][i] = -200 * Deformation_parameter * fx[i] * fx[i] * exp(-fx[i]);
+    }
 }
 
 
@@ -151,7 +157,8 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
     if (L < max_L){
         if(particle_type == 0){
             for(int i=0;i<N;i++){
-                vector_p[L][i] += Potential[i];
+               vector_p[L][i] -= Potential[i];
+//                 vector_p[L][i] += 0;
             }
         }
         else{

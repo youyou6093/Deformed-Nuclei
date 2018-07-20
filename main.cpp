@@ -23,7 +23,7 @@
 #include <algorithm>
 using namespace std;
 #define MAX_KAPPA 7
-#define ITENUM 200
+// #define ITENUM 700
 
 /*--------------------set up global varialbes-----------------------------*/
 
@@ -66,6 +66,7 @@ unordered_map<string, vector<vector<double>> > States_map;   //store the infos a
 unordered_map<string, double> Energy_map;                    //store the energies for every state
 // unordered_map<string, double > Angular_map;                  //Stroe the value A in my notes
 int max_k; //max kappa when I want to construct the basis 
+int itenum;
 /*---------------------------------finishing global varialbes-------------------------------------*/
 #include "preprocess.h"
 
@@ -90,7 +91,7 @@ int main(int argc, char ** argv){
     
     
     
-    
+    double oldmin = 1.0;
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
     unordered_map<string, double>::iterator Angular_ptr;
     unordered_map<string, vector<vector<double>>>::iterator States_ptr;
@@ -110,6 +111,7 @@ int main(int argc, char ** argv){
     Deformation_parameter = stod(argv[3]);
     max_L = atoi(argv[4]);
     max_k = atoi(argv[5]);
+    itenum = atoi(argv[6]);
 
     preprocessing();                    //Prepare the states Hash Map
     /*initialize the PHI W B A potential
@@ -138,7 +140,7 @@ int main(int argc, char ** argv){
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
     
     
-    for(int ite=0;ite<ITENUM;ite++){
+    for(int ite=0;ite<itenum;ite++){
         chrono::steady_clock::time_point tpold = chrono::steady_clock::now();
         /*Make sure OCCs are empty*/
         occp_raw.clear();
@@ -213,6 +215,18 @@ int main(int argc, char ** argv){
         
         for(int i = 0; i < max_L; i++)
             cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+        
+        /* a new test*/
+        int min_index;
+        double min_dens = 10;
+        for(int i =0; i < N; i ++){
+            if (denv[1][i] < min_dens){
+                min_dens = denv[1][i];
+                min_index = i;
+            }
+        }
+        
+        
         /* compute the effective density
          solve the klein-gordon equation
          update the potentials*/
@@ -222,6 +236,9 @@ int main(int argc, char ** argv){
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
         
+
+        cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
+        oldmin = min_dens;
         /* output the energy*/
         // for(int ii = 0; ii < occp.size(); ii ++){
         //     eig2 test = occp[ii];
@@ -238,21 +255,21 @@ int main(int argc, char ** argv){
         // }
         
         
-        for(int i = 0 ;i < max_L; i++){
-            if((ite % 5) == 0){
+        // for(int i = 0 ;i < max_L; i++){
+        //     if((ite % 50) == 0 && i == 1){
 
-            ofstream outfile;
-            ofstream outfile2;
-            outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".txt");
-            // outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
-            for(int j = 0; j < N; j++){
-                outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-                // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-            }
-            outfile.close();
-            outfile2.close();
-        }
-        }
+        //     ofstream outfile;
+        //     ofstream outfile2;
+        //     outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".dat");
+        //     // outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
+        //     for(int j = 0; j < N; j++){
+        //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+        //         // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+        //     }
+        //     outfile.close();
+        //     outfile2.close();
+        // }
+        // }
         
         
         /*get energy*/
@@ -264,25 +281,25 @@ int main(int argc, char ** argv){
     
     /* option part ,
      output all the potentials and densities */
-//     for(int i = 0 ;i < max_L; i++){
-//         ofstream outfile;
-//         ofstream outfile2;
-//         outfile.open("density" + to_string(i) + ".txt");
-//         outfile2.open("potential" + to_string(i) + ".txt");
-//         for(int j = 0; j < N; j++){
-//             outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-//             outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-//         }
-//         outfile.close();
-//         outfile2.close();
-//     }
-//   if (max_L > 1){
-//       ofstream outfile;
-//       outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
-//       for(int j = 0; j < N; j++){
-//           outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
-//       }
-//   }
+    // for(int i = 0 ;i < max_L; i++){
+    //     ofstream outfile;
+    //     ofstream outfile2;
+    //     outfile.open("density" + to_string(i) + ".txt");
+    //     outfile2.open("potential" + to_string(i) + ".txt");
+    //     for(int j = 0; j < N; j++){
+    //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+    //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+    //     }
+    //     outfile.close();
+    //     outfile2.close();
+    // }
+  if (max_L > 1){
+      ofstream outfile;
+      outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
+      for(int j = 0; j < N; j++){
+          outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
+      }
+  }
 
  
     
