@@ -10,10 +10,12 @@
 #define symm_h
 
 #include <stdio.h>
-#include <gsl/gsl_math.h>
-#include <gsl/gsl_eigen.h>
+//#include <gsl/gsl_math.h>
+//#include <gsl/gsl_eigen.h>
 #include<vector>
 #include<iostream>
+#include "Eigen/Eigenvalues"
+using namespace Eigen;
 using namespace std;
 //be careful, this program will change the content of the array passed in if you use the array constructor
 
@@ -32,20 +34,31 @@ class matrix_diag{
 private:
     double *m_array = NULL;             //1d array
     //--------------------------------------
-    gsl_matrix_view m;             //gsl matrix
-    gsl_vector *eval = NULL;              //eigenvalues later
-    gsl_matrix *evec = NULL;              //eigenvectors later
-    gsl_eigen_symmv_workspace * w = NULL;
+//    gsl_matrix_view m;             //gsl matrix
+//    gsl_vector *eval = NULL;              //eigenvalues later
+//    gsl_matrix *evec = NULL;              //eigenvectors later
+//    gsl_eigen_symmv_workspace * w = NULL;
     //-----------------------------------------
     
+    MatrixXd m;
+//    VectorXd eval;
+//    MatrixXd evec;
+    SelfAdjointEigenSolver<MatrixXd> eigenSolver;
     void diagonalize(){
-        m=gsl_matrix_view_array(m_array, size, size);
-        eval=gsl_vector_alloc(size);
-        evec=gsl_matrix_alloc(size, size);
-        w=gsl_eigen_symmv_alloc(size);
-        gsl_eigen_symmv (&m.matrix, eval, evec, w);
-        gsl_eigen_symmv_free(w);
-        gsl_eigen_symmv_sort(eval,evec,GSL_EIGEN_SORT_ABS_ASC);
+        m = MatrixXd::Zero(size,size);
+        for (size_t i = 0; i < size; ++i)
+            for (size_t j = 0; j < size; ++j)
+                m(i,j) = m_array[i * size +j];
+        eigenSolver.compute(m);
+        
+//        m=gsl_matrix_view_array(m_array, size, size);
+//        eval=gsl_vector_alloc(size);
+//        evec=gsl_matrix_alloc(size, size);
+//        w=gsl_eigen_symmv_alloc(size);
+//        gsl_eigen_symmv (&m.matrix, eval, evec, w);
+//        gsl_eigen_symmv_free(w);
+//        gsl_eigen_symmv_sort(eval,evec,GSL_EIGEN_SORT_ABS_ASC);
+        
     }
 
     
@@ -55,8 +68,8 @@ public:
     int size;                 //size of the matrix(not total size, just the dimension of the matrix)
     
     ~matrix_diag(){              //destructor
-        gsl_vector_free(eval);
-        gsl_matrix_free(evec);
+//        gsl_vector_free(eval);
+//        gsl_matrix_free(evec);
 //        cout << "freeing" << endl;
     }
     
@@ -64,18 +77,26 @@ public:
         results.clear();
         diagonalize();              //diagnolize the matrix
         eig temp;                   //stores a pair of eigenvalues and eigenvectors
-        for(int i=0;i<size;i++){
-//            double eval_i=gsl_vector_get(eval,i);                   //get ith eigenvalues
-//            gsl_vector_view evec_i=gsl_matrix_column(evec,i);       //get ith eigenvectors
-            temp.eigen_values=eval->data[i];                               //store eigenvalues
-            for(int j=0;j<size;j++){
-//                double x = gsl_vector_get(&evec_i.vector,j);
-                double x = evec->data[i + j * size];
-                temp.eigen_vectors.push_back(x);                   //store ith eigenvectors,
-                                                                   //jth values
+//        for(int i=0;i<size;i++){
+////            double eval_i=gsl_vector_get(eval,i);                   //get ith eigenvalues
+////            gsl_vector_view evec_i=gsl_matrix_column(evec,i);       //get ith eigenvectors
+//            temp.eigen_values=eval->data[i];                               //store eigenvalues
+//            for(int j=0;j<size;j++){
+////                double x = gsl_vector_get(&evec_i.vector,j);
+//                double x = evec->data[i + j * size];
+//                temp.eigen_vectors.push_back(x);                   //store ith eigenvectors,
+//                                                                   //jth values
+//            }
+//            results.push_back(temp);
+//            temp.eigen_vectors.clear();                            //clear the temp;
+//        }
+        for(int i = 0; i < size; i++){
+            temp.eigen_values = eigenSolver.eigenvalues()[i];
+            for(int j =0;j<size;j++){
+                temp.eigen_vectors.push_back(eigenSolver.eigenvectors().col(i)[j]);
             }
             results.push_back(temp);
-            temp.eigen_vectors.clear();                            //clear the temp;
+            temp.eigen_vectors.clear();
         }
     }
     

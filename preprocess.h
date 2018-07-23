@@ -10,8 +10,10 @@
 void preprocessing(){
     /* get the input parameters */
     ifstream parameter_file;
+//    double something;
     parameter_file.open(parameters);
     parameter_file >> ms;
+//    cout << something << endl;
     parameter_file >> mv;
     parameter_file >> mp;
     parameter_file >> mg;

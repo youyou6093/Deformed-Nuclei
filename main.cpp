@@ -29,24 +29,25 @@ using namespace std;
 
 /*constants*/
 const double PI=atan(1.0)*4;
-string parameters = "parameter.txt";  // the file contains the model parameters
+//string parameters = "/Users/junjieyang/Dropbox/project/Deform_c_new/parameter.txt";  // the file contains the model parameters
+string parameters = "parameter.txt";
 double my_tolerance=1e-3;   //tolerance of the integrator
 
-/*model parameters, default values are FSUGOLD*/
+/*model parameters, default values are linear*/
 double hbarc=197.326;
-double ms=491.500/hbarc;
+double ms=520.0/hbarc;
 double mv=782.5/hbarc;
 double mp=763.0/hbarc;
 double mg=0.00000001/hbarc;
-double gs=112.199551;
-double gv=204.546943;
-double gp=138.470113;
+double gs=109.63;
+double gv=190.43;
+double gp=65.23;
 double gg=4*PI/137.0;
 double lambdas=0.0;
-double lambdav=0.030;
-double lambda=0.023762;
-double ks=0.0600;
-double ka=1.420333/hbarc;
+double lambdav=0.0;
+double lambda=0.0;
+double ks=0.0000;
+double ka=0.0/hbarc;
 
 
 /* Computation constants */
@@ -106,19 +107,19 @@ int main(int argc, char ** argv){
     vector<eig2> temp_solution;
 
     //Command line part
-//    proton_number = atoi(argv[1]);
-//    neutron_number = atoi(argv[2]);
-//    Deformation_parameter = stod(argv[3]);
-//    max_L = atoi(argv[4]);
-//    max_k = atoi(argv[5]);
-//    itenum = atoi(argv[6]);
+    proton_number = atoi(argv[1]);
+    neutron_number = atoi(argv[2]);
+    Deformation_parameter = stod(argv[3]);
+    max_L = atoi(argv[4]);
+    max_k = atoi(argv[5]);
+    itenum = atoi(argv[6]);
     
-    proton_number = 20;
-    neutron_number = 20;
-    Deformation_parameter = 0;
-    max_L = 1;
-    max_k = 7;
-    itenum = 50;
+//    proton_number = 20;
+//    neutron_number = 20;
+//    Deformation_parameter = 0;
+//    max_L = 1;
+//    max_k = 7;
+//    itenum = 50;
 
     preprocessing();                    //Prepare the states Hash Map
     /*initialize the PHI W B A potential
