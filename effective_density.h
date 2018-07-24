@@ -147,8 +147,8 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
                    int L){
     
     //get hl^ and jl^ based 
-    double h_bessel = 0.0001;
-    int Numbers = 10000;
+    double h_bessel = 0.001;
+    int Numbers = 1000;
     vector<vector<double>> ret = NormalizedRiccatijI(h_bessel, Numbers, L);
     vector<double> ydata(Numbers + 1, 0.0);
     vector<double> xdata(Numbers + 1, 0.0);

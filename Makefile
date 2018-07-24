@@ -1,8 +1,8 @@
 main: main.o RacahFunctions.o
-	g++ main.o RacahFunctions.o -o main -lgsl -lblas  
+	g++ main.o -fopenmp RacahFunctions.o -o main -lgsl -lblas  
 
 main.o:
-	g++ -c -std=c++11 main.cpp -O3
+	g++ -c -fopenmp -std=c++11 main.cpp  -O3
 
 RacahFunctions.o:
 	gfortran RacahFunctions.f -c

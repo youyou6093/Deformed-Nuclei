@@ -13,7 +13,7 @@ def compute_integral(fx, rhov):
 
 N = int(raw_input("N= "))
 Z = int(raw_input("Z= "))
-x_data = [0.08, 0.10,0.12,0.15]  #need to add xdata
+x_data = [0.01, 0.04,0.08, 0.1]  #need to add xdata
 y_data = []
 path = raw_input()
 names = os.listdir(path)
@@ -25,6 +25,8 @@ for i in names:
 	fx = data[:,0]
 	rho3 = data[:,3]   #this is den3
 	y_data.append(compute_integral(fx, rho3))
+print x_data
+print y_data
 slope, intercept, r_value, p_value, std_err =  stats.linregress(x_data, y_data)
 print stats.linregress(x_data, y_data)
 plt.plot(x_data, y_data, 'k.', x_data, y_data, 'g-')
