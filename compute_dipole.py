@@ -35,5 +35,5 @@ plt.plot(x_data, y_data, 'k.', x_data, y_data, 'g-')
 plt.show()
 m2 = abs(0.5 * slope)
 m1 = 14.8 * N * Z / (N + Z)
-print "Econ = %.2f" % (m1/m2)**0.5
-print "M-1 = %.2f" %m2
+print "Econ = %.4f" % (m1/m2)**0.5
+print "M-1 = %.4f" %m2
