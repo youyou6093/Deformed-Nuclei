@@ -87,7 +87,7 @@ int main(int argc, char ** argv){
     vector<State> States_m;        //the basis quantum number of a specific m
     vector<eig2> occp,occn;        //occupied states of protons and neutrons
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
-    vector<eig2> temp_solution;
+    vector<eig2> temp_solution;          //eig2 contains eig, m; eig contains eigenvalues and eigenvectors
 //    proton_number = 20;
 //    neutron_number = 20;
 //    Deformation_parameter = 0;
@@ -129,9 +129,8 @@ int main(int argc, char ** argv){
             States_m=generate_statesm(m, max_L);        //States for this m
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);
             if (M.size()!=States_m.size()) cout<<"States Size != Matrix size"<<endl;
-            flat=flat_matrix(M);
             /*diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix*/
-            matrix_diag diag = matrix_diag(flat,int(States_m.size()));
+            matrix_diag diag = matrix_diag(M);
             diag.get_results();
             /*diag.results is a matrix full of eigvalues and eigenvectors.
               I need to add m to the result to form the basis*/
@@ -140,8 +139,7 @@ int main(int argc, char ** argv){
             occn_raw.insert(occn_raw.end(), temp_solution.begin(), temp_solution.end());
             /*get the matrix for the specific m,proton*/
             M=generate_full_matrix(scalar_p, vector_p, States_m, m);
-            flat=flat_matrix(M);
-            diag=matrix_diag(flat,int(States_m.size()));
+            diag=matrix_diag(M);
             diag.get_results();
             temp_solution = get_temp_solution(diag.results, m);
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
