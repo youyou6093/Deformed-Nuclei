@@ -86,7 +86,6 @@ int magic(int n){
             min=a[i];
         }
     }
-//    return abs(min)-0.5;
     return 2 * abs(min) - 1;
 }
 

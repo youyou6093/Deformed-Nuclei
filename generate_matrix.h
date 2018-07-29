@@ -71,20 +71,11 @@ double Angular_depedencek(int k1, int k2, int m, int L){
 }
 
 
-/*Generat key for find the angular dependence
-  right Now I didn't use it at all*/
-string generate_key(double m,int k1,int k2,int L){
-    if (m > 0)
-        return to_string(int(m))+".5"+"."+to_string(k1)+"."+to_string(k2)+"."+to_string(L);
-    else
-        return "-" + to_string(int(abs(m)))+".5"+"."+to_string(k1)+"."+to_string(k2)+"."+to_string(L);
-}
 
 /* A struct that stores the params*/
 struct params{
     int n1,n2,k1,k2,s1,s2;
     vector<double> g1,g2,f1,f2;
-//    double *g1;
     int m;
     double diag_energy;
     vector<vector<double>> scalar_p,vector_p;
@@ -97,9 +88,7 @@ struct params{
 double calculate_matrix_element(struct params & my_params,int L){
     double value1,value2,angular_term,value3;
     double E1,E2,E3;
-//    vector<double> y1,y2,y3,y4,y5;
     double *y4 = new double[N];
-//    vector<double> y4(N,0.0);
     /*The spherical symmetric potential part*/
     if (L==0){
         /*Diagonal part*/
@@ -114,17 +103,12 @@ double calculate_matrix_element(struct params & my_params,int L){
                 value1=(my_params.scalar_p[L][i]+my_params.vector_p[L][i])*my_params.g1[i]*my_params.g2[i]/hbarc;
                 value2=(-my_params.scalar_p[L][i]+my_params.vector_p[L][i])*my_params.f1[i]*my_params.f2[i]/hbarc;
                 value3=-(1/pow(b,2))*(my_params.g1[i]*my_params.f2[i]+my_params.g2[i]*my_params.f1[i])*fx[i];
-//                y3.push_back(value1+value2+value3);
                 y4[i] = value1+value2+value3;
             }
             E2=simps(y4,&(fx[0]),N);
-            // E2 = my_spline(y3, fx, my_tolerance).integral();
-//            y3.clear();
         }
         else
             E2=0.0;
-//        delete [] y4;
-//        return E1+E2;
         E3 = E1 + E2;
     }
     
@@ -140,12 +124,10 @@ double calculate_matrix_element(struct params & my_params,int L){
                 /* Radial part of the integral*/
                 value1=angular_term * (my_params.scalar_p[L][i] + my_params.vector_p[L][i]) * my_params.g1[i] * my_params.g2[i] / hbarc;
                 value2=angular_term * (-my_params.scalar_p[L][i] + my_params.vector_p[L][i]) * my_params.f1[i] * my_params.f2[i] / hbarc;
-//                y4.push_back(value1+value2);
                 y4[i] = value1+value2;
             }
             E3 = simps(y4,&(fx[0]),N);
             // E3 = my_spline(y4, fx, my_tolerance).integral();
-//            y4.clear();
         }
     }
     delete [] y4;
@@ -169,10 +151,7 @@ void generate_matrix(vector<vector<double>> &M,vector<vector<double>> &scalar_po
     my_params.s1=states[i].sign;
     my_params.s2=states[j].sign;
     my_params.diag_energy=Energy_map.find(states[i].key)->second; //the energy for states[i]
-    
-    
     States_ptr=States_map.find(states[i].key);
-//    my_params.g1=&(States_ptr->second[0][0]);
     my_params.g1=States_ptr->second[0];
     my_params.f1=States_ptr->second[1];
     States_ptr=States_map.find(states[j].key);
@@ -181,8 +160,6 @@ void generate_matrix(vector<vector<double>> &M,vector<vector<double>> &scalar_po
     my_params.scalar_p=scalar_potential;
     my_params.vector_p=vector_potential;
     
-
-   
     for(int L=0; L <max_L; L++){
         matrix_element+=calculate_matrix_element(my_params, L);
     }

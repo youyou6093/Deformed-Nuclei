@@ -1,23 +1,17 @@
 //  diagnolize a normal matrix
 //  symm.h
-//  gsl_matrix
-//
 //  Created by Junjie Yang on 5/9/17.
 //  Copyright © 2017 Junjie Yang. All rights reserved.
-// tested
 
 #ifndef symm_h
 #define symm_h
 
 #include <stdio.h>
-//#include <gsl/gsl_math.h>
-//#include <gsl/gsl_eigen.h>
 #include<vector>
 #include<iostream>
 #include "Eigen/Eigenvalues"
 using namespace Eigen;
 using namespace std;
-//be careful, this program will change the content of the array passed in if you use the array constructor
 
 struct eig{              //a structure that stores the eigenvectors
     double eigen_values;
@@ -70,7 +64,6 @@ public:
     ~matrix_diag(){              //destructor
 //        gsl_vector_free(eval);
 //        gsl_matrix_free(evec);
-//        cout << "freeing" << endl;
     }
     
     void get_results(){             //get eigenvalues-eigenvectors pair(real part)

@@ -66,6 +66,7 @@ int itenum;
 /*body of the function*/
 int main(int argc, char ** argv){
     //Input part
+    cout << Angular_depedencek(2,2,1,0) << endl;
     proton_number = atoi(argv[1]);
     neutron_number = atoi(argv[2]);
     Deformation_parameter = stod(argv[3]);
