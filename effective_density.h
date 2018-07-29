@@ -1,5 +1,3 @@
-/* Need additional check for this part*/
-
 //
 //  effective_density.h
 //  deform_c++
@@ -51,26 +49,16 @@ vector<int> possible_L(int l1,int l2){
 
 /*Multiple two Legendre series together*/
 vector<vector<double>> multiplication(vector<vector<double>> &vec1,vector<vector<double>> &vec2){
-    vector<vector<double>> new_vec;
-    vector<double> temp;
-    vector<int> all_L;
-    int Big_L;
-    for(int i=0;i<max_L;i++){
-        new_vec.push_back(empty);
-    }
+    vector<vector<double>> new_vec(max_L, vector<double>(N, 0.0));
+    vector<int> all_L;  //all possible L
+    int Big_L;          //the combination of two vec
     for(int i=0;i<max_L;i++){
         for(int j=0;j<max_L;j++){
             all_L=possible_L(i, j);             //get all possible  L with i and j
             for(int k=0;k<all_L.size();k++){    //loop through all possible L
                 Big_L=all_L[k];
                 if (Big_L<max_L){               //if valid
-                    temp.clear();
-                    for(int ii=0;ii<N;ii++){    //get temp
-                        temp.push_back(vec1[i][ii]*vec2[j][ii]*pow(pcg_(i, j, Big_L),2));
-                    }
-                    for(int ii=0;ii<N;ii++){
-                        new_vec[Big_L][ii]+=temp[ii];  //update the new vector
-                    }
+                    for(int ii=0;ii<N;ii++)   new_vec[Big_L][ii] += vec1[i][ii] * vec2[j][ii] * pow(pcg_(i, j, Big_L), 2);
                 }
             }
         }
@@ -96,6 +84,7 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
     po4=multiplication(W2, B);
     double h3 = hbarc * hbarc * hbarc;
     double h2 = hbarc * hbarc;
+
     for(int i=0;i<max_L;i++){
         for(int j=0;j<N;j++){
             EFF_Phi[i][j] = dens[i][j] + 2*lambdas*po1[i][j]/h3-(lambda/6.0)*Phi3[i][j]/h3-(ka/2.0)*Phi2[i][j]/h2;
@@ -108,7 +97,7 @@ void get_effective_density(vector<vector<double>> &EFF_Phi,vector<vector<double>
 
 
 
-//get the riccatijI
+//Prepare the Bessel function and hankle function
 void Get_bessels(int type, my_spline & riccatijIs, vector<vector<double>> &JIs, vector<vector<double>> &HIs, int L){
     double m;
     if(type == 0){
@@ -130,11 +119,7 @@ void Get_bessels(int type, my_spline & riccatijIs, vector<vector<double>> &JIs, 
         HIs[type][i] = riccatihI(L, fx[i] * m);
     }
     JIs[type][0] = 0.0;
-    HIs[type][0] = 0.0;
-//    vector<double> test = fx;
-    
-//    cout << fx[100] * m << ' ' << JIs[type][100] << endl;
-    
+    HIs[type][0] = 0.0;    
 }
 
 
@@ -156,30 +141,17 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     	ydata[i] = ret[1][i];
     	xdata[i] = ret[0][i];
     }
-//    cout << xdata[0] << ' ' << xdata[Numbers-1] << endl;
     my_spline riccatijIs = my_spline(ydata, xdata, 0.001);
-//    for(int i = 0; i < 10; i++)
-//        cout << ydata[i] << endl;
     // precompute all the bessel functions
     vector<vector<double>> JIs(3, vector<double>(N, 0.0)), HIs(3, vector<double>(N, 0.0));
     Get_bessels(0, riccatijIs, JIs, HIs, L);
     Get_bessels(1, riccatijIs, JIs, HIs, L);
     Get_bessels(2, riccatijIs, JIs, HIs, L);
-//    for(int i = 0; i < 10; i++){
-//        cout << JIs[0][1] << ' '  << HIs[0][1] << endl;
-////        cout << 1 << endl;
-//    }
     
 #pragma omp parallel for
     
     
     for(int i=1;i<N;i++){
-       // Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein(ms,  EFF_Phi[L] , i)/3.0; //not sure whether I can just put gs outside
-       // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein(mv, EFF_W[L], i)/3.0;
-       // B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein(mp , EFF_B[L], i)/3.0;
-       // A[L][i] = hbarc * gg * poisson(denp[L], i, L);
-//        A[L][i] = hbarc * gg * klein(mg, denp[L], i);
-
          // Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs)/3.0; //not sure whether I can just put gs outside
          // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs)/3.0;
          // B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs)/3.0;
@@ -189,22 +161,12 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
          W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
          B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
          A[L][i] = hbarc * gg * poisson(denp[L], i, L);
-        
-        
-//        Phi[L][i] =   hbarc * gs * klein(ms,  EFF_Phi[L] , i); //not sure whether I can just put gs outside
-//        W[L][i] =    hbarc * gv * klein(mv, EFF_W[L], i);
-//        B[L][i] =  hbarc * gp * klein(mp , EFF_B[L], i);
-//        A[L][i] = hbarc * gg * klein(mg, denp[L], i);
     }
-//    vector<vector<double>> test = Phi;
     
     Phi[L][0] = Phi[L][1];
     W[L][0] = W[L][1];
     B[L][0] = B[L][1];
     A[L][0] = A[L][1];
-//    vector<vector<double>> test = Phi;
-    
-    
 }
 
 /*update the potential*/
@@ -214,8 +176,6 @@ void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &E
         for(int j=0;j<max_L;j++){
             get_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp, j);
         }
-//        for(int j=0; j < max_L; j++)
-//            cout <<"channel="<<j<<':'<< Phi[j][0] <<' '<< W[j][0]<<' '<<B[j][0]<<' '<<A[j][0]<<endl;
         
     }
 }

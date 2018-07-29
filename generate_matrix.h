@@ -5,9 +5,6 @@
 //  Created by Junjie Yang on 4/18/17.
 //  Copyright © 2017 Junjie Yang. All rights reserved.
 
-
-/* I think I fixed this one*/
-
 #ifndef generate_matrix_h
 #define generate_matrix_h
 #include "simps.h"

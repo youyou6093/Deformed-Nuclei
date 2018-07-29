@@ -100,11 +100,8 @@ public:
         vector<double> radial1=vector_multiple(x.wavefunctions[a].upper,x.wavefunctions[b].upper);          //f1*f1prime
         vector<double> radial2=vector_multiple(x.wavefunctions[a].lower,x.wavefunctions[b].lower);          //f2*f2prime
         for(int i=0;i<N;i++){
-//            radial1[i]/=pow(fx[i],2);    //divide by r**2
-//            radial2[i]/=pow(fx[i],2);
-            radial1[i]/= fx[i] * fx[i];    //divide by r**2
-            radial2[i]/= fx[i] * fx[i];
-
+            radial1[i]/= (fx[i] * fx[i]);    //divide by r**2
+            radial2[i]/= (fx[i] * fx[i]);
         }
         radial1[0]=radial1[1];
         radial2[0]=radial2[1];
@@ -130,7 +127,6 @@ public:
     /*pick one states*/
     void compute(int num){
         Solution x=solution[num];
-//        vector<int> kappas=x.kappas;
         for(int i=0;i<x.kappas.size();i++)
             for(int j=0;j<x.kappas.size();j++)
                 compute_one_(i, j, num);
@@ -159,28 +155,7 @@ void generate_density(vector<eig2> &occn, vector<eig2> &occp, vector<vector<doub
     all_states_n.Compute_all();
     density_p=all_states_p.density;
     density_n=all_states_n.density;
-//    for(int i=0;i<max_L;i++){
-//        vector<double> temp1,temp2,temp3,temp4;
-//        for(int j=0;j<N;j++){
-//            temp1.push_back(density_p[i].s[j]);           //scalar density of proton
-//            temp2.push_back(density_p[i].v[j]);           //vector density of proton
-//            temp3.push_back(density_n[i].s[j]);           //scalar density of neutron
-//            temp4.push_back(density_n[i].v[j]);           //vector density of neutron
-//        }
-//        densp.push_back(temp1);
-//        denvp.push_back(temp2);
-//        densn.push_back(temp3);
-//        denvn.push_back(temp4);
-//    }
-//
-//    for(int i=0;i<max_L;i++){
-//        for(int j=0;j<N;j++){
-//            dens[i][j]=densn[i][j]+densp[i][j];
-//            denv[i][j]=denvn[i][j]+denvp[i][j];
-//            den3[i][j]=denvp[i][j]-denvn[i][j];
-//            denp[i][j]=denvp[i][j];
-//        }
-    //}
+
     for(int i=0;i<max_L;i++){
         for(int j=0;j<N;j++){
             dens[i][j]=density_n[i].s[j] + density_p[i].s[j];
