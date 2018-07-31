@@ -147,6 +147,7 @@ int main(int argc, char ** argv){
         
         /* Form the solution for occupied state*/
         get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state, utility.h
+        //I didn't use final occp and final occn here
         Final_occn=get_solutions_object(occn);                   //get solution object, density.h
         Final_occp=get_solutions_object(occp);
         /* Form the densities */

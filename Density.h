@@ -69,14 +69,11 @@ public:
         solution=get_solutions_object(occ);  //Get a set of obeject of class of solution
         for(int i=0;i<solution.size();i++)
             solution[i].get_all_wavefunction(); //Compute all the wavefunction
-        vector<double> empty;
-        den big_empty;
-        for(int i=0;i<N;i++)
-            empty.push_back(0.0);
-        big_empty.s=empty;
-        big_empty.v=empty;
         for(int i=0;i<max_L;i++){
-            density.push_back(big_empty);    //Give zero to all density values
+        	den temp;
+        	temp.s = vector<double>(N, 0.0);
+        	temp.v = vector<double>(N, 0.0);
+            density.push_back(temp);    //Give zero to all density values
         }
     }
     
@@ -93,7 +90,7 @@ public:
     void compute_one_(int a,int b,int num){
         Solution x=solution[num];      //one of the occ state
         int m=x.m;                     //get m
-        double coef;             //coef is the A(m,k1,k2,L) in my calculations
+        double coef;             //coef is the alpha(m,k1,k2,L)
         vector<int> kappas=x.kappas;   //all Kappa in this occ state
         int k1=x.wavefunctions[a].kappa;        // the first kappa of this state
         int k2=x.wavefunctions[b].kappa;        // the second kappa of this state
