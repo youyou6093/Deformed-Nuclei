@@ -108,13 +108,11 @@ public:
             if(L_group[i]<max_L){
                 coef = Angular_depedencek(k1, k2, m, L_group[i]);
                 den temp;
-//                temp.s.clear();
-//                temp.v.clear();
-                temp.s.reserve(N);
-                temp.v.reserve(N);
+                temp.s = vector<double>(N,0.0);
+                temp.v = vector<double>(N,0.0);
                 for(int j=0;j<N;j++){
-                    temp.s.push_back(coef*(radial1[j]-radial2[j]));          //scalar
-                    temp.v.push_back(coef*(radial1[j]+radial2[j]));          //vector
+                    temp.s[j] = coef*(radial1[j]-radial2[j]);          //scalar
+                    temp.v[j] = coef*(radial1[j]+radial2[j]);          //vector
                 }
                 append(temp, L_group[i]);
             }
@@ -145,14 +143,11 @@ public:
 void generate_density(vector<eig2> &occn, vector<eig2> &occp, vector<vector<double>> &dens,
                           vector<vector<double>> &denv,vector<vector<double>> &denp,vector<vector<double>> &den3){
     Density all_states_p(occp),all_states_n(occn); // the constructor will find the wave funcitons of all occ state
-    vector<den> density_p,density_n;
-    vector<vector<double>> denvp,denvn,densn,densp;
-    
+    vector<den> density_p,density_n;    
     all_states_p.Compute_all();
     all_states_n.Compute_all();
     density_p=all_states_p.density;
     density_n=all_states_n.density;
-
     for(int i=0;i<max_L;i++){
         for(int j=0;j<N;j++){
             dens[i][j]=density_n[i].s[j] + density_p[i].s[j];

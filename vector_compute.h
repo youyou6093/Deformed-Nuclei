@@ -14,10 +14,8 @@ vector<double> vector_add(vector<double> & a,vector<double>& b){
 }
 
 vector<double> vector_multiple(vector<double> &a,vector<double> &b){
-    vector<double> c;
-    for(int i=0;i<a.size();i++){
-        c.push_back(a[i]*b[i]);
-    }
+    vector<double> c(a.size(), 0.0);
+    for(int i=0;i<a.size();i++) c[i] = a[i] * b[i];
     return c;
 }
 
