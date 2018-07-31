@@ -62,6 +62,8 @@ public:
     }
     
     /*An eigenvalue from diagnolizing matrix*/
+    //this constructor will give me the pair of eigenvectors and states
+    //also it will provide all the kappas
     Solution(eig2 result){
         this->m = result.m;                                //m is the quantum numbrer
         energy=result.solution.eigen_values;               //Energy for the solution
@@ -123,15 +125,16 @@ public:
     }
 
 
-    /*Find the primary state*/
+    /*Find the primary state, make sure the primary states always have + sign, increase numerical stability*/
     void get_primary_state(){
         vector<State> states = generate_statesm(m, max_L);
         int max = 0;
         int sign = 1;
-        for(int i=0;i<my_pair.size();i++)
+        for(int i=0;i<my_pair.size();i++){
             if (abs(my_pair[i].coefs)>abs(my_pair[max].coefs)){
                 max=i;
             }
+        }
         
         /* new modification, make sure the primary state is positive */
         if ((abs(my_pair[max].coefs) * my_pair[max].coefs) >= 0)
@@ -150,13 +153,13 @@ public:
     
     /*get the wave function for one kappa*/
     solution_wave_function get_wave_function(int kappa){
-        vector<double> upper,lower,g,f;
+        vector<double> g,f;
+        vector<double> upper(N, 0.0);
+        vector<double> lower(N, 0.0);
         unordered_map<string, vector<vector<double>>>::iterator States_ptr;
         coef_pair temp;
-        for(int i=0;i<N;i++){
-            upper.push_back(0.0);
-            lower.push_back(0.0);
-        }
+
+        //go through every wavefunction in this solution
         for(int i=0;i<my_pair.size();i++){
             temp=my_pair[i];               //get one element from the pair
             if(temp.state.k==kappa){       //if the kappa of that state is what I want
@@ -177,7 +180,7 @@ public:
     }
     
     
-    /*get the complete wavefunction*/
+    /*get the complete wavefunction, it will be stored in wavefunctions struct, has kappa, f and g*/
     void get_all_wavefunction(){               //get all wavefunctions that I need
         get_primary_state();                   //get primary state and correct the sign
         wavefunctions.clear();
