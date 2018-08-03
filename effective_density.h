@@ -156,7 +156,7 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
          // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs)/3.0;
          // B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs)/3.0;
          // A[L][i] = hbarc * gg * poisson(denp[L], i, L);
-
+        // here gs, gv, gp, gg are all squared
          Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
          W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
          B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
@@ -172,6 +172,7 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
 /*update the potential*/
 void update_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_B,vector<vector<double>> &EFF_A,vector<vector<double>> &EFF_W,vector<vector<double>> &Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> &A,vector<vector<double>> &dens,vector<vector<double>> &denv,vector<vector<double>> & den3,vector<vector<double>> &denp){
     for(int i=0; i<5; i++){        //how many iteration I want to solve klein-gordon equation
+        //calculate the non-linear part, the iso density coming out is applied by 1/2
         get_effective_density(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
         for(int j=0;j<max_L;j++){
             get_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp, j);
