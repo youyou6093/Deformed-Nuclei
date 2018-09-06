@@ -103,11 +103,14 @@ int main(int argc, char ** argv){
       original density*/
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;
     /*Determine the range of m, just roughly determine*/
-    int min_m = -magic(max(proton_number,neutron_number));
+    int min_m = -magic(max(proton_number,neutron_number)) - 2;
     int max_m = -min_m;
+    // int min_m = -13;
+    // int max_m = +13;
     cout<<"Finishing processing."<<endl;
     cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
     cout << "Deformation_parameter = " << Deformation_parameter << endl;
+    cout << "M range is: " << min_m << "->" << max_m << endl; 
     /*The occupied states from solving */
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
     
