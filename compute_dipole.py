@@ -1,4 +1,4 @@
-#modified in 07/06/18
+#modified in 09/26/2018
 import numpy as np
 from scipy.integrate import simps
 from scipy import stats
@@ -13,7 +13,8 @@ def compute_integral(fx, rhov):
 
 N = int(raw_input("N= "))
 Z = int(raw_input("Z= "))
-x_data = [0.01, 0.04,0.08, 0.1]  #need to add xdata
+# x_data = [0.01, 0.04,0.08, 0.1]  #need to add xdata
+x_data = [0.0, 0.04, 0.08, 0.12, 0.16]
 y_data = []
 path = raw_input()
 names = os.listdir(path)
@@ -23,7 +24,7 @@ for i in names:
 	print i
 	data = np.loadtxt(path + i)
 	fx = data[:,0]
-	rho3 = data[:,3]   #this is den3
+	rho3 = 0.5 * data[:,3]   #this is den3, in my program, den3 is the direct difference between denp - denn so I need to multiply by 0.5
 	y_data.append(compute_integral(fx, rho3))
 print x_data
 print y_data

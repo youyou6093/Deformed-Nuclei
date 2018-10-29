@@ -18,7 +18,9 @@
 #include "Green-method.h"
 #include "effective_density.h"
 #include "utility.h"
+#include "computeEnergy.h"
 #include <algorithm>
+#include <iomanip>
 using namespace std;
 #define MAX_KAPPA 7
 /*--------------------set up global varialbes-----------------------------*/
@@ -103,7 +105,7 @@ int main(int argc, char ** argv){
       original density*/
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;
     /*Determine the range of m, just roughly determine*/
-    int min_m = -magic(max(proton_number,neutron_number)) - 2;
+    int min_m = -magic(max(proton_number,neutron_number)) - 4;
     int max_m = -min_m;
     // int min_m = -13;
     // int max_m = +13;
@@ -122,7 +124,8 @@ int main(int argc, char ** argv){
         occn_raw.clear();
         occp.clear();
         occn.clear();
-        for(int i=0;i<N;i++)    Potential[i] = fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        //because this the added dipole operator contains lambda * tauz *  r * Y10
+        for(int i=0;i<N;i++)    Potential[i] = 0.5 * fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
         /*Every iteration it updates the meson potentials,so it need to recompute the scalar and vector potentials*/
         /*those two functions are in preprocess.h*/
         generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron   preprocess.h
@@ -198,37 +201,45 @@ int main(int argc, char ** argv){
         oldmin = min_dens;
         
         /* output the energy*/
-        // for(int ii = 0; ii < occp.size(); ii ++){
-        //     eig2 test = occp[ii];
-        //     Solution temp = Solution(test);
-        //     cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << endl;
-        //     temp.print_eigenvectors();
-        // }
-        // for(int ii = 0; ii < occn.size(); ii ++){
-        //     eig2 test = occn[ii];
-        //     Solution temp = Solution(test);
-        //     cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << endl;
-        //     temp.print_eigenvectors();
+//        ofstream energyfile;
+//        energyfile.open("output/energies.txt");
+         for(int ii = 0; ii < occp.size(); ii ++){
+             eig2 test = occp[ii];
+             Solution temp = Solution(test);
+             temp.get_primary_state();
+             cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+//             temp.print_eigenvectors();
+//             energyfile << setprecision(9) << temp.energy << endl;
+         }
+         for(int ii = 0; ii < occn.size(); ii ++){
+             eig2 test = occn[ii];
+             Solution temp = Solution(test);
+             temp.get_primary_state();
+             cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+//             energyfile << setprecision(9) << temp.energy << endl;
+//             temp.print_eigenvectors();
 
-        // }
+         }
+//        energyfile.close();
         
-        // for(int i = 0 ;i < max_L; i++){
-        //     if((ite % 50) == 0 && i == 1){
-        //     ofstream outfile;
-        //     ofstream outfile2;
-        //     outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".dat");
-        //     // outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
-        //     for(int j = 0; j < N; j++){
-        //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-        //         // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-        //     }
-        //     outfile.close();
-        //     outfile2.close();
-        // }
-        // }
-        
+//         for(int i = 0 ;i < max_L; i++){
+//             if((ite % 50) == 0 && i == 1){
+//             ofstream outfile;
+//             ofstream outfile2;
+//             outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".dat");
+//              outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
+//             for(int j = 0; j < N; j++){
+//                 outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+//                 // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+//             }
+//             outfile.close();
+//             outfile2.close();
+//         }
+//         }
+//
         
         /*get energy*/
+        cout<<"total energy = " << setprecision(9) << compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp) << endl;
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
