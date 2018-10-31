@@ -67,7 +67,7 @@ int itenum;
 
 /*body of the function*/
 int main(int argc, char ** argv){
-    //Input part
+    //Input part and the parameters
     cout << Angular_depedencek(2,2,1,0) << endl;
     proton_number = atoi(argv[1]);
     neutron_number = atoi(argv[2]);
@@ -90,33 +90,31 @@ int main(int argc, char ** argv){
     vector<eig2> occp,occn;        //occupied states of protons and neutrons
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;          //eig2 contains eig, m; eig contains eigenvalues and eigenvectors
-//    proton_number = 20;
-//    neutron_number = 20;
-//    Deformation_parameter = 0;
-//    max_L = 1;
-//    max_k = 7;
-//    itenum = 50;
-    preprocessing();                    //Prepare the states Hash Map
-    /*initialize the PHI W B A potential
-      the potentials here are all in Mev*/
-    preprocessing_2(Phi, W, B, A);
-    /*Initially, there is no dipole potential added*/
-    /*Set the effecitive density in KG part to be the same as
-      original density*/
-    EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;
+    vector<double> allEnergies(itenum, 0.0);
+
+/*default parameters
+    proton_number = 20;
+    neutron_number = 20;
+    Deformation_parameter = 0;
+    max_L = 1;
+    max_k = 7;
+    itenum = 50;
+*/
+    preprocessing();                    //Prepare the states HashMap
+    preprocessing_2(Phi, W, B, A);      //initialize the PHI W B A potential the potentials here are all in Mev
+    EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;  /*Set the effecitive density in KG part to be the same as
+                                                      original density*/
     /*Determine the range of m, just roughly determine*/
     int min_m = -magic(max(proton_number,neutron_number)) - 4;
     int max_m = -min_m;
-    // int min_m = -13;
-    // int max_m = +13;
-    cout<<"Finishing processing."<<endl;
+    //print the set up
     cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
-    cout << "Deformation_parameter = " << Deformation_parameter << endl;
-    cout << "M range is: " << min_m << "->" << max_m << endl; 
+    cout << "Dipole Parameter = " << Deformation_parameter << endl;
+    cout << "M range is: " << min_m << " -> " << max_m << endl;
     /*The occupied states from solving */
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
     
-    
+    //The self consistent calculations
     for(int ite=0;ite<itenum;ite++){
         chrono::steady_clock::time_point tpold = chrono::steady_clock::now();
         /*Make sure OCCs are empty*/
@@ -125,15 +123,17 @@ int main(int argc, char ** argv){
         occp.clear();
         occn.clear();
         //because this the added dipole operator contains lambda * tauz *  r * Y10
-        for(int i=0;i<N;i++)    Potential[i] = 0.5 * fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
-        /*Every iteration it updates the meson potentials,so it need to recompute the scalar and vector potentials*/
-        /*those two functions are in preprocess.h*/
+        for(int i=0; i<N; i++)    Potential[i] = 0.5 * fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        /*Every iteration it updates the meson potentials,so it need to recompute the scalar and vector potentials
+          those two functions are in preprocess.h
+          compute the scalar and vector potential based on the meson fields
+         */
         generate_potential(Phi, W, B, A, Potential, scalar_n, vector_n, Potential_channel, 0);   //neutron   preprocess.h
         generate_potential(Phi, W, B, A, Potential, scalar_p, vector_p, Potential_channel, 1);   //proton
         /* Solve the dirac equation*/
-        for(int m = min_m ; m < max_m + 1 ; m+=2){      //The m here is actually 2 m
-            States_m=generate_statesm(m, max_L);        //States for this m
-            vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m);
+        for(int m = min_m ; m < max_m + 1 ; m+=2){      //The m here is actually 2 m, so add 2 every iteration
+            States_m=generate_statesm(m, max_L);        //get all states based on m and MaxL
+            vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m); //generate the matrix for neutrons
             if (M.size()!=States_m.size()) cout<<"States Size != Matrix size"<<endl;
             /*diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix*/
             matrix_diag diag = matrix_diag(M);
@@ -150,7 +150,6 @@ int main(int argc, char ** argv){
             temp_solution = get_temp_solution(diag.results, m);
             occp_raw.insert(occp_raw.end(),temp_solution.begin(),temp_solution.end());
         }
-        
         /* Form the solution for occupied state*/
         get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state, utility.h
         //I didn't use final occp and final occn here
@@ -171,10 +170,10 @@ int main(int argc, char ** argv){
 //             }
 //         }
         
-        dens_old = dens;
-        denv_old = denv;
-        den3_old = den3;
-        denp_old = denp;
+//        dens_old = dens;
+//        denv_old = denv;
+//        den3_old = den3;
+//        denp_old = denp;
         
         for(int i = 0; i < max_L; i++)
             cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
@@ -200,28 +199,8 @@ int main(int argc, char ** argv){
         cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
         oldmin = min_dens;
         
-        /* output the energy*/
-//        ofstream energyfile;
-//        energyfile.open("output/energies.txt");
-         for(int ii = 0; ii < occp.size(); ii ++){
-             eig2 test = occp[ii];
-             Solution temp = Solution(test);
-             temp.get_primary_state();
-             cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-//             temp.print_eigenvectors();
-//             energyfile << setprecision(9) << temp.energy << endl;
-         }
-         for(int ii = 0; ii < occn.size(); ii ++){
-             eig2 test = occn[ii];
-             Solution temp = Solution(test);
-             temp.get_primary_state();
-             cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-//             energyfile << setprecision(9) << temp.energy << endl;
-//             temp.print_eigenvectors();
 
-         }
-//        energyfile.close();
-        
+
 //         for(int i = 0 ;i < max_L; i++){
 //             if((ite % 50) == 0 && i == 1){
 //             ofstream outfile;
@@ -239,15 +218,15 @@ int main(int argc, char ** argv){
 //
         
         /*get energy*/
-        cout<<"total energy = " << setprecision(9) << compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp) << endl;
+        allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
+        cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
         cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
     } //end the iterations
     
-    /* option part ,
-     output all the potentials and densities */
+    /* option part, output all the potentials and densities */
     // for(int i = 0 ;i < max_L; i++){
     //     ofstream outfile;
     //     ofstream outfile2;
@@ -261,6 +240,7 @@ int main(int argc, char ** argv){
     //     outfile2.close();
     // }
 
+    //output the L = 1 channel of density
     if(max_L > 1){
         ofstream outfile;
         outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
@@ -268,9 +248,46 @@ int main(int argc, char ** argv){
             outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
         }
     }
+    
+    //output the energies over iterations
+    ofstream energyfile;
+    energyfile.open("output/energies.txt");
+    for (int i = 0; i < itenum; i++) {
+        energyfile << setprecision(9) << allEnergies[i] << endl;
+    }
+    energyfile.close();
+    
+    /* output the energy*/
+    //        ofstream energyfile;
+    //        energyfile.open("output/energies.txt");
+    for(int ii = 0; ii < occp.size(); ii ++){
+        eig2 test = occp[ii];
+        Solution temp = Solution(test);
+        temp.get_primary_state();
+        cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+        //             temp.print_eigenvectors();
+        //             energyfile << setprecision(9) << temp.energy << endl;
+    }
+    for(int ii = 0; ii < occn.size(); ii ++){
+        eig2 test = occn[ii];
+        Solution temp = Solution(test);
+        temp.get_primary_state();
+        cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+        //             energyfile << setprecision(9) << temp.energy << endl;
+        //             temp.print_eigenvectors();
+        
+    }
+    //--------------------------------------------------------
+    /* get time */
+    chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
+    chrono::steady_clock::duration d = tp2-tp1;
+    cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
+    cout <<"maxL = "<<max_L<< endl;
+    cout <<"Deformation parameter = "<< Deformation_parameter << endl;
+}
 
- 
- /* output wavefunctions */
+
+/* output wavefunctions */
 //     for(int ii = 0; ii < occp.size(); ii ++){
 //         eig2 test = occp[ii];
 //         Solution temp = Solution(test);
@@ -289,31 +306,22 @@ int main(int argc, char ** argv){
 //             outfile.close();
 //         }
 //     }
-    
-    
-    // for(int ii = 0; ii < occn.size(); ii ++){
-    //     eig2 test = occn[ii];
-    //     Solution temp = Solution(test);
-    //     temp.get_all_wavefunction();
-    //     cout << ii << " energy for occn = " << temp.energy << endl;
-    //     string some = "mkdir " + string("testout/wfn") + to_string(ii);
-    //     const char * path = some.c_str();
-    //     system(path);
-    //     for(int i = 0; i < temp.wavefunctions.size(); i ++){
-    //         ofstream outfile;
-    //         outfile.open("testout/wfn" + to_string(ii) + '/' + "wavefunction" + to_string(temp.wavefunctions[i].kappa) + ".txt");
-    //         for(int j = 0; j < N; j++){
-    //             outfile << fx[j] << ' ' << temp.wavefunctions[i].upper[j] << ' ' << temp.wavefunctions[i].lower[j] << ' ' << temp.m << ' ' << temp.energy << endl;
-    //         }
-    //         outfile.close();
-    //     }
-    // }
-    
-    
-    /* get time */
-    chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
-    chrono::steady_clock::duration d = tp2-tp1;
-    cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
-    cout <<"maxL = "<<max_L<< endl;
-    cout <<"Deformation parameter = "<< Deformation_parameter << endl;
-}
+
+
+// for(int ii = 0; ii < occn.size(); ii ++){
+//     eig2 test = occn[ii];
+//     Solution temp = Solution(test);
+//     temp.get_all_wavefunction();
+//     cout << ii << " energy for occn = " << temp.energy << endl;
+//     string some = "mkdir " + string("testout/wfn") + to_string(ii);
+//     const char * path = some.c_str();
+//     system(path);
+//     for(int i = 0; i < temp.wavefunctions.size(); i ++){
+//         ofstream outfile;
+//         outfile.open("testout/wfn" + to_string(ii) + '/' + "wavefunction" + to_string(temp.wavefunctions[i].kappa) + ".txt");
+//         for(int j = 0; j < N; j++){
+//             outfile << fx[j] << ' ' << temp.wavefunctions[i].upper[j] << ' ' << temp.wavefunctions[i].lower[j] << ' ' << temp.m << ' ' << temp.energy << endl;
+//         }
+//         outfile.close();
+//     }
+// }
