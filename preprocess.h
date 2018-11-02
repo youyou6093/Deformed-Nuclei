@@ -40,6 +40,8 @@ void preprocessing(){
     parameter_file >> start[1];
     parameter_file >> start[2];
     parameter_file >> start[3];
+
+    parameter_file >> Potential_channel;
     /*--------------------------------------------- */
     cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
     cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
@@ -52,6 +54,7 @@ void preprocessing(){
     cout << "Dipole Parameter = " << Deformation_parameter << endl;
     cout << "The range of the wave function is " << rmax << endl;
     cout << "Number of points for every wave_function" << endl;
+    cout << "The extra potential channel is " << Potential_channel << endl;
     ms /= hbarc;
     mv /= hbarc;
     mp /= hbarc;
