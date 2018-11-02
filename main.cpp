@@ -61,6 +61,7 @@ unordered_map<string, vector<vector<double>> > States_map;   //store the infos a
 unordered_map<string, double> Energy_map;                    //store the energies for every state
 int max_k; //max kappa when I want to construct the basis 
 int itenum;
+int nodes;
 /*---------------------------------finishing global varialbes-------------------------------------*/
 #include "preprocess.h"
 
@@ -68,13 +69,14 @@ int itenum;
 /*body of the function*/
 int main(int argc, char ** argv){
     //Input part and the parameters
-    cout << Angular_depedencek(2,2,1,0) << endl;
-    proton_number = atoi(argv[1]);
-    neutron_number = atoi(argv[2]);
-    Deformation_parameter = stod(argv[3]);
-    max_L = atoi(argv[4]);
-    max_k = atoi(argv[5]);
-    itenum = atoi(argv[6]);
+    // cout << Angular_depedencek(2,2,1,0) << endl;
+    // proton_number = atoi(argv[1]);
+    // neutron_number = atoi(argv[2]);
+    // Deformation_parameter = stod(argv[3]);
+    // max_L = atoi(argv[4]);
+    // max_k = atoi(argv[5]);
+    // itenum = atoi(argv[6]);
+    preprocessing();                    //Prepare the states HashMap
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
     unordered_map<string, vector<vector<double>>>::iterator States_ptr;
@@ -100,7 +102,6 @@ int main(int argc, char ** argv){
     max_k = 7;
     itenum = 50;
 */
-    preprocessing();                    //Prepare the states HashMap
     preprocessing_2(Phi, W, B, A);      //initialize the PHI W B A potential the potentials here are all in Mev
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;  /*Set the effecitive density in KG part to be the same as
                                                       original density*/
@@ -108,8 +109,8 @@ int main(int argc, char ** argv){
     int min_m = -magic(max(proton_number,neutron_number)) - 4;
     int max_m = -min_m;
     //print the set up
-    cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
-    cout << "Dipole Parameter = " << Deformation_parameter << endl;
+    // cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
+    // cout << "Dipole Parameter = " << Deformation_parameter << endl;
     cout << "M range is: " << min_m << " -> " << max_m << endl;
     /*The occupied states from solving */
     vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
@@ -132,7 +133,7 @@ int main(int argc, char ** argv){
         generate_potential(Phi, W, B, A, Potential, scalar_p, vector_p, Potential_channel, 1);   //proton
         /* Solve the dirac equation*/
         for(int m = min_m ; m < max_m + 1 ; m+=2){      //The m here is actually 2 m, so add 2 every iteration
-            States_m=generate_statesm(m, max_L);        //get all states based on m and MaxL
+            States_m=generate_statesm(m, max_L, nodes);        //get all states based on m and MaxL
             vector<vector<double>> M = generate_full_matrix(scalar_n, vector_n, States_m, m); //generate the matrix for neutrons
             if (M.size()!=States_m.size()) cout<<"States Size != Matrix size"<<endl;
             /*diagnolize the matrix, add all the eigenvalues and eigenvectors into M_matrix*/

@@ -16,6 +16,7 @@
 #include "states.cpp"
 extern int max_L;
 extern int N;
+extern int nodes;
 extern unordered_map<string, vector<vector<double>> > States_map;
 using std::vector;
 using namespace std;
@@ -68,7 +69,7 @@ public:
         this->m = result.m;                                //m is the quantum numbrer
         energy=result.solution.eigen_values;               //Energy for the solution
         coef_pair temp;                                    //Just a holder for the pair
-        vector<State> states=generate_statesm(m,max_L);    //Generate the basis for this m
+        vector<State> states=generate_statesm(m,max_L,nodes);    //Generate the basis for this m
         for(int i=0;i<states.size();i++){
             /* Avoiding small coefficients due to some numerical errors*/
             // if (abs(result.solution.eigen_vectors[i])>1e-5){
@@ -127,7 +128,7 @@ public:
 
     /*Find the primary state, make sure the primary states always have + sign, increase numerical stability*/
     void get_primary_state(){
-        vector<State> states = generate_statesm(m, max_L);
+        vector<State> states = generate_statesm(m, max_L, nodes);
         int max = 0;
         int sign = 1;
         for(int i=0;i<my_pair.size();i++){

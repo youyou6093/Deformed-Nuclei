@@ -31,7 +31,7 @@ vector<State> generate_statesk(int nodes,int k,int m){
     
 }
 
-vector<State> generate_statesm(int m,int max_L,int nodes=10){
+vector<State> generate_statesm(int m,int max_L,int nodes){
     vector<State> my_states,state1;
     int kmin = (abs(m) + 1) / 2;
     // int kmax = max_k + max_L;

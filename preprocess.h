@@ -11,23 +11,44 @@ void preprocessing(){
     /* get the input parameters */
     ifstream parameter_file;
     parameter_file.open(parameters);
+    
     parameter_file >> ms;
     parameter_file >> mv;
     parameter_file >> mp;
     parameter_file >> mg;
+
     parameter_file >> gs;
     parameter_file >> gv;
     parameter_file >> gp;
     parameter_file >> gg;
+    
     parameter_file >> lambdas;
     parameter_file >> lambdav;
     parameter_file >> lambda;
     parameter_file >> ks;
     parameter_file >> ka;
+    
+    parameter_file >> proton_number;
+    parameter_file >> neutron_number;
+    parameter_file >> max_L;
+    parameter_file >> max_k;
+    parameter_file >> itenum;
+    parameter_file >> Deformation_parameter;
+    parameter_file >> nodes;
+
+    parameter_file >> start[0];
+    parameter_file >> start[1];
+    parameter_file >> start[2];
+    parameter_file >> start[3];
     /*--------------------------------------------- */
     cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
     cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
     cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl;
+    cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
+    cout << "channels = " << max_L << " " << "MAX_KAPPA is fixed to 15" << endl;
+    cout << "Number of nodes = " << nodes << endl;
+    cout << "Run " << itenum << " iterations" << endl;
+    cout << "Dipole Parameter = " << Deformation_parameter << endl;
     ms /= hbarc;
     mv /= hbarc;
     mp /= hbarc;
@@ -44,7 +65,7 @@ void preprocessing(){
     
     /*this is the largest basis, gives me everything in the basis,
       MAX_KAPPA is defined in the main.cpp*/
-    vector<State>states_1 = generate_statesm(1,MAX_KAPPA);     //right now it is 7
+    vector<State>states_1 = generate_statesm(1, MAX_KAPPA, nodes);     //right now it is 7
     for(int i=0;i<states_1.size();i++){
         dirac_oscillator ho(states_1[i].sign,states_1[i].n,states_1[i].k,b,rmin,rmax,N);
         wave_function.clear();   //empty the array
@@ -60,7 +81,6 @@ void preprocessing(){
 /*initialize the potentials to wood-saxon form*/
 void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vector<vector<double>> &B,vector<vector<double>> & A){
     double value;
-    
     /* wood saxon part */
     for(int i=0;i<N;i++){
         value=(exp(fx[i]-4.3)/0.7+1);
@@ -81,7 +101,7 @@ void preprocessing_2(vector<vector<double>> & Phi,vector<vector<double>> &W,vect
  L is the channel of the potential we add*/
 void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, vector<vector<double>> &B,vector<vector<double>> &A,vector<double> &Potential,vector<vector<double>> &scalar_p,vector<vector<double>> &vector_p,int L,int particle_type){
     
-
+    // cout << "size" << scalar_p.size() << endl;
     if (particle_type==0){                                //neutron
         for(int i=0; i<max_L; i++){                    //for all the channel
             for(int j=0; j<N; j++){
@@ -98,6 +118,8 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
             }
         }
     }
+    // cout << "test" << endl;
+
     
     /* USE vector potential*/
     /* put the potential we add to the scalar and vector part, depend on what I want the potential to be*/
