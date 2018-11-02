@@ -202,21 +202,7 @@ int main(int argc, char ** argv){
         
 
 
-//         for(int i = 0 ;i < max_L; i++){
-//             if((ite % 50) == 0 && i == 1){
-//             ofstream outfile;
-//             ofstream outfile2;
-//             outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".dat");
-//              outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
-//             for(int j = 0; j < N; j++){
-//                 outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-//                 // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-//             }
-//             outfile.close();
-//             outfile2.close();
-//         }
-//         }
-//
+
         
         /*get energy*/
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
@@ -227,20 +213,26 @@ int main(int argc, char ** argv){
         cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
     } //end the iterations
     
-    /* option part, output all the potentials and densities */
-    // for(int i = 0 ;i < max_L; i++){
-    //     ofstream outfile;
-    //     ofstream outfile2;
-    //     outfile.open("density" + to_string(i) + ".txt");
-    //     outfile2.open("potential" + to_string(i) + ".txt");
-    //     for(int j = 0; j < N; j++){
-    //         outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-    //         outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-    //     }
-    //     outfile.close();
-    //     outfile2.close();
-    // }
 
+    /* option part, output all the potentials and densities */
+    cout << "output all potentials and densities? choose y/n" << endl;
+    string flag;
+    cin >> flag;
+    if (flag == "y") {
+    	for(int i = 0 ;i < max_L; i++){
+        	ofstream outfile;
+        	ofstream outfile2;
+        	outfile.open("density" + to_string(i) + ".txt");
+        	outfile2.open("potential" + to_string(i) + ".txt");
+        	for(int j = 0; j < N; j++){
+            	outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+            	outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+        	}
+        	outfile.close();
+        	outfile2.close();
+    	}
+    } 
+    
     //output the L = 1 channel of density
     if(max_L > 1){
         ofstream outfile;
@@ -252,32 +244,29 @@ int main(int argc, char ** argv){
     
     //output the energies over iterations
     ofstream energyfile;
-    energyfile.open("output/energies.txt");
+    energyfile.open("output/totalenergies" + to_string(Deformation_parameter) + ".txt");
     for (int i = 0; i < itenum; i++) {
         energyfile << setprecision(9) << allEnergies[i] << endl;
     }
     energyfile.close();
     
-    /* output the energy*/
-    //        ofstream energyfile;
-    //        energyfile.open("output/energies.txt");
-    for(int ii = 0; ii < occp.size(); ii ++){
-        eig2 test = occp[ii];
+    /* output the single state energy*/
+    energyfile.open("output/singleStateEnergy" + to_string(Deformation_parameter) + ".txt");
+    for(int i = 0; i < occp.size(); i ++){
+        eig2 test = occp[i];
         Solution temp = Solution(test);
         temp.get_primary_state();
-        cout << ii << " energy for occp = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-        //             temp.print_eigenvectors();
-        //             energyfile << setprecision(9) << temp.energy << endl;
+        energyfile << i << setprecision(9) << " energy for occp = " << temp.energy <<
+             ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
     }
-    for(int ii = 0; ii < occn.size(); ii ++){
-        eig2 test = occn[ii];
+    for(int i = 0; i < occn.size(); i ++){
+        eig2 test = occn[i];
         Solution temp = Solution(test);
         temp.get_primary_state();
-        cout << ii << " energy for occn = " << temp.energy << ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-        //             energyfile << setprecision(9) << temp.energy << endl;
-        //             temp.print_eigenvectors();
-        
+        energyfile << i << setprecision(9) << " energy for occn = " << temp.energy << ' '
+         << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
     }
+    energyfile.close();
     //--------------------------------------------------------
     /* get time */
     chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
@@ -307,8 +296,6 @@ int main(int argc, char ** argv){
 //             outfile.close();
 //         }
 //     }
-
-
 // for(int ii = 0; ii < occn.size(); ii ++){
 //     eig2 test = occn[ii];
 //     Solution temp = Solution(test);
@@ -326,3 +313,21 @@ int main(int argc, char ** argv){
 //         outfile.close();
 //     }
 // }
+
+
+//output density during the iterations
+//         for(int i = 0 ;i < max_L; i++){
+//             if((ite % 50) == 0 && i == 1){
+//             ofstream outfile;
+//             ofstream outfile2;
+//             outfile.open("output/density" + to_string(i) + ' ' + to_string(ite) + ".dat");
+//              outfile2.open("output/potential" + to_string(i) + ' ' + to_string(ite) +  ".txt");
+//             for(int j = 0; j < N; j++){
+//                 outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+//                 // outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+//             }
+//             outfile.close();
+//             outfile2.close();
+//         }
+//         }
+//

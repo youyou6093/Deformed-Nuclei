@@ -45,10 +45,13 @@ void preprocessing(){
     cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
     cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl;
     cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
-    cout << "channels = " << max_L << " " << "MAX_KAPPA is fixed to 15" << endl;
+    cout << "channels = " << max_L << endl;
+    cout << "Max kappa = " << max_k << endl;
     cout << "Number of nodes = " << nodes << endl;
     cout << "Run " << itenum << " iterations" << endl;
     cout << "Dipole Parameter = " << Deformation_parameter << endl;
+    cout << "The range of the wave function is " << rmax << endl;
+    cout << "Number of points for every wave_function" << endl;
     ms /= hbarc;
     mv /= hbarc;
     mp /= hbarc;
