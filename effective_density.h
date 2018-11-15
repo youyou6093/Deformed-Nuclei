@@ -152,15 +152,15 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     
     
     for(int i=1;i<N;i++){
-         // Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs)/3.0; //not sure whether I can just put gs outside
-         // W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs)/3.0;
-         // B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs)/3.0;
-         // A[L][i] = hbarc * gg * poisson(denp[L], i, L);
-        // here gs, gv, gp, gg are all squared
-         Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
-         W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
-         B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
+         Phi[L][i] = 2 * Phi[L][i]/3.0 + hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0) / 3.0; //not sure whether I can just put gs outside
+         W[L][i] = 2 * W[L][i]/3.0 + hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1) / 3.0;
+         B[L][i] = 2 * B[L][i]/3.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2) / 3.0;
          A[L][i] = hbarc * gg * poisson(denp[L], i, L);
+        // here gs, gv, gp, gg are all squared
+         // Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
+         // W[L][i] =  hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
+         // B[L][i] =  hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
+         // A[L][i] = hbarc * gg * poisson(denp[L], i, L);
     }
     
     Phi[L][0] = Phi[L][1];
