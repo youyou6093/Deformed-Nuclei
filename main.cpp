@@ -70,7 +70,8 @@ int nodes;
 int main(int argc, char ** argv){
     //Input part and the parameters
     // cout << Angular_depedencek(2,2,1,0) << endl;
-    // proton_number = atoi(argv[1]);
+    string arg = string(argv[1]);
+    parameters = "parameter_" + arg + ".txt";
     // neutron_number = atoi(argv[2]);
     // Deformation_parameter = stod(argv[3]);
     // max_L = atoi(argv[4]);

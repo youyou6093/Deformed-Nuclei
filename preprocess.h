@@ -10,6 +10,7 @@
 void preprocessing(){
     /* get the input parameters */
     ifstream parameter_file;
+    cout << "using file " << parameters << endl; 
     parameter_file.open(parameters);
     
     parameter_file >> ms;
