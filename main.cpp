@@ -76,6 +76,8 @@ int main(int argc, char ** argv){
     // max_L = atoi(argv[4]);
     // max_k = atoi(argv[5]);
     // itenum = atoi(argv[6]);
+    string arg = string(argv[1]);
+    parameters = "parameter_" + arg + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
