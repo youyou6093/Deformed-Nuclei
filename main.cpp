@@ -210,6 +210,8 @@ int main(int argc, char ** argv){
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
+        vector<double> radius = computeRadius(denv, denp);
+        cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
         cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;

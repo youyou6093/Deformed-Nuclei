@@ -1,6 +1,7 @@
 #ifndef computeEnergy_h
 #define computeEnergy_h
 #include "integrator.h"
+#include "legendre.h"
 #include <algorithm>
 using namespace std;
 
@@ -36,6 +37,27 @@ double compute_energy2(vector<eig2> &occp,vector<eig2> &occn,vector<vector<doubl
     double be = ret / (proton_number + neutron_number) - ecm;
 //    cout << "B/A is " << be << endl;
     return ret;
+}
+
+
+vector<double> computeRadius(vector<vector<double>> &denv, vector<vector<double>> &denp) {
+    vector<vector<double>> denn(denv.size(), vector<double>(denv[0].size(), 0.0));
+    for (int i = 0; i < denv.size(); i++) {
+        for (int j = 0; j < denv[0].size(); j++) {
+            denn[i][j] = denv[i][j] - denp[i][j];
+        }
+    }
+    vector<double> inte(N, 0.0);
+    double rnn, rnp;
+    for (int i = 0; i < N; i++) {
+        inte[i] = pow(fx[i], 4) * denn[0][i]; 
+    }
+    rnn = 4 * PI * my_spline(inte, fx, my_tolerance).integral() / neutron_number;
+    for (int i = 0; i < N; i++) {
+        inte[i] = pow(fx[i], 4) * denp[0][i];
+    }
+    rnp = 4 * PI * my_spline(inte, fx, my_tolerance).integral() / proton_number;
+    return {sqrt(rnp), sqrt(rnn), - sqrt(rnp) + sqrt(rnn)};
 }
 
 
