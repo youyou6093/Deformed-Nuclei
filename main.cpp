@@ -77,7 +77,8 @@ int main(int argc, char ** argv){
     // max_k = atoi(argv[5]);
     // itenum = atoi(argv[6]);
     string arg = string(argv[1]);
-    parameters = "parameter_" + arg + ".txt"; 
+    cout << "arguments is " << arg << endl;
+    parameters = "family/parameter_garnet" + arg + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
@@ -95,6 +96,8 @@ int main(int argc, char ** argv){
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;          //eig2 contains eig, m; eig contains eigenvalues and eigenvectors
     vector<double> allEnergies(itenum, 0.0);
+    vector<double> radius;
+    double bindingPerParticle;
 
 /*default parameters
     proton_number = 20;
@@ -209,8 +212,9 @@ int main(int argc, char ** argv){
         /*get energy*/
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
-        cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
-        vector<double> radius = computeRadius(denv, denp);
+        bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
+        cout<<"E/A="<< bindingPerParticle <<endl;
+        radius = computeRadius(denv, denp);
         cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
@@ -219,9 +223,9 @@ int main(int argc, char ** argv){
     
 
     /* option part, output all the potentials and densities */
-    cout << "output all potentials and densities? choose y/n" << endl;
-    string flag;
-    cin >> flag;
+    // cout << "output all potentials and densities? choose y/n" << endl;
+    string flag = "n";
+    // cin >> flag;
     if (flag == "y") {
     	for(int i = 0 ;i < max_L; i++){
         	ofstream outfile;
@@ -278,6 +282,13 @@ int main(int argc, char ** argv){
     cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
     cout <<"maxL = "<<max_L<< endl;
     cout <<"Deformation parameter = "<< Deformation_parameter << endl;
+
+
+    //output neutron skin
+    ofstream testoutputfile;
+    testoutputfile.open("skin.txt", std::ios_base::app);
+  	testoutputfile << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
+  	return 0;
 }
 
 
