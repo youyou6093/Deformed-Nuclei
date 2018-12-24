@@ -76,10 +76,22 @@ int main(int argc, char ** argv){
     // max_L = atoi(argv[4]);
     // max_k = atoi(argv[5]);
     // itenum = atoi(argv[6]);
-    string arg = string(argv[1]);
-    cout << "arguments is " << arg << endl;
-    parameters = "family/parameter_garnet" + arg + ".txt"; 
+
+    //the arguments contains : parameter number, proton number, neutron number, outputfilename
+    string parameterNumber = argv[1];
+    string outputfileName;
+    cout << "arguments is " << parameterNumber  << endl;
+    //set the parameter name
+    parameters = "parameter" + parameterNumber + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
+    //update the proton number and neutron number as well as the output file name
+    proton_number = atoi(argv[2]);
+    neutron_number = atoi(argv[3]);
+    outputfileName = argv[4];
+    max_k = atoi(argv[5]);
+    //print the arguments just in case
+    cout << "other arguments " << proton_number << ' ' << neutron_number << ' ' << outputfileName << ' ' 
+         << max_k << endl; 
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
     unordered_map<string, vector<vector<double>>>::iterator States_ptr;
@@ -111,7 +123,7 @@ int main(int argc, char ** argv){
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;  /*Set the effecitive density in KG part to be the same as
                                                       original density*/
     /*Determine the range of m, just roughly determine*/
-    int min_m = -magic(max(proton_number,neutron_number)) - 4;
+    int min_m = -magic(max(proton_number,neutron_number));
     int max_m = -min_m;
     //print the set up
     // cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
@@ -211,6 +223,7 @@ int main(int argc, char ** argv){
         
         /*get energy*/
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
+        if (abs(allEnergies[ite]) > 1500) break;
         cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"E/A="<< bindingPerParticle <<endl;
@@ -286,7 +299,7 @@ int main(int argc, char ** argv){
 
     //output neutron skin
     ofstream testoutputfile;
-    testoutputfile.open("skin.txt", std::ios_base::app);
+    testoutputfile.open("output/" + outputfileName + "radius.txt", std::ios_base::app);
   	testoutputfile << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
   	return 0;
 }
