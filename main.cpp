@@ -69,21 +69,14 @@ int nodes;
 /*body of the function*/
 int main(int argc, char ** argv){
     //Input part and the parameters
-    // cout << Angular_depedencek(2,2,1,0) << endl;
-    // proton_number = atoi(argv[1]);
-    // neutron_number = atoi(argv[2]);
-    // Deformation_parameter = stod(argv[3]);
-    // max_L = atoi(argv[4]);
-    // max_k = atoi(argv[5]);
-    // itenum = atoi(argv[6]);
-
     //the arguments contains : parameter number, proton number, neutron number, outputfilename
-    string parameterNumber = argv[1];
+    string parameterName = argv[1];
     string outputfileName;
-    cout << "arguments is " << parameterNumber  << endl;
+    cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "parameter" + parameterNumber + ".txt"; 
+    parameters = "parameters/" + parameterName + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
+    itenum = 100;
     //update the proton number and neutron number as well as the output file name
     proton_number = atoi(argv[2]);
     neutron_number = atoi(argv[3]);
@@ -92,46 +85,34 @@ int main(int argc, char ** argv){
     //print the arguments just in case
     cout << "other arguments " << proton_number << ' ' << neutron_number << ' ' << outputfileName << ' ' 
          << max_k << endl; 
+    //define the variables
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
-    unordered_map<string, vector<vector<double>>>::iterator States_ptr;
-    vector<vector<double>> Phi(max_L,vector<double>(N, 0.0));
+    unordered_map<string, vector<vector<double>>>::iterator States_ptr;  //store oscillator wavefunctions
+    vector<vector<double>> Phi(max_L,vector<double>(N, 0.0));            //set up meson potentials
     vector<vector<double>> W = Phi, B = Phi, A = Phi;
-    vector<vector<double>> dens = Phi, denv = Phi, denp = Phi, den3 = Phi;
-    vector<vector<double>> EFF_Phi = Phi, EFF_W = Phi, EFF_B = Phi, EFF_A = Phi;
-    vector<vector<double>> dens_old = Phi, denv_old = Phi, denp_old = Phi, den3_old = Phi;
-    vector<vector<double>> scalar_p = Phi, vector_p = Phi, scalar_n = Phi, vector_n = Phi;
-    vector<double> Potential(N, 0.0);
-    vector<double> flat; //flat is the flatted matrix
-    vector<State> States_m;        //the basis quantum number of a specific m
-    vector<eig2> occp,occn;        //occupied states of protons and neutrons
+    vector<vector<double>> dens = Phi, denv = Phi, denp = Phi, den3 = Phi;  //set up density
+    vector<vector<double>> EFF_Phi = Phi, EFF_W = Phi, EFF_B = Phi, EFF_A = Phi;   //set up effective density
+    vector<vector<double>> dens_old = Phi, denv_old = Phi, denp_old = Phi, den3_old = Phi;  //soft update density   
+    vector<vector<double>> scalar_p = Phi, vector_p = Phi, scalar_n = Phi, vector_n = Phi;  //set up scalar and vector poetntial
+    vector<double> Potential(N, 0.0);   //dipole potential
+    vector<double> flat; //flatted matrix
+    vector<State> States_m;              //the basis quantum number of a specific m
+    vector<eig2> occp,occn;              //occupied states of protons and neutrons
     vector<eig2> occp_raw,occn_raw;      //raw solution of matrix
     vector<eig2> temp_solution;          //eig2 contains eig, m; eig contains eigenvalues and eigenvectors
-    vector<double> allEnergies(itenum, 0.0);
-    vector<double> radius;
-    double bindingPerParticle;
-
-/*default parameters
-    proton_number = 20;
-    neutron_number = 20;
-    Deformation_parameter = 0;
-    max_L = 1;
-    max_k = 7;
-    itenum = 50;
-*/
+                                         //temp solution contains the result for one matrix diag
+    vector<double> allEnergies(itenum, 0.0);   //store total energy of the system
+    vector<double> radius;                     //store reaidus of the system(rp, rn, rskin)
+    double bindingPerParticle;                 //store binding energy per particles
     preprocessing_2(Phi, W, B, A);      //initialize the PHI W B A potential the potentials here are all in Mev
     EFF_Phi=dens; EFF_W=dens;EFF_A=dens;EFF_B=dens;  /*Set the effecitive density in KG part to be the same as
                                                       original density*/
     /*Determine the range of m, just roughly determine*/
     int min_m = -magic(max(proton_number,neutron_number));
     int max_m = -min_m;
-    //print the set up
-    // cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
-    // cout << "Dipole Parameter = " << Deformation_parameter << endl;
     cout << "M range is: " << min_m << " -> " << max_m << endl;
-    /*The occupied states from solving */
-    vector<Solution> Final_occp,Final_occn;                 //Final solution for 1 iteration
-    
+    vector<Solution> Final_occp,Final_occn;                 //Final solution for every iteration
     //The self consistent calculations
     for(int ite=0;ite<itenum;ite++){
         chrono::steady_clock::time_point tpold = chrono::steady_clock::now();
@@ -170,12 +151,11 @@ int main(int argc, char ** argv){
         }
         /* Form the solution for occupied state*/
         get_solution(occp_raw, occn_raw, occp, occn);            //get sorted occ state, utility.h
-        //I didn't use final occp and final occn here
+        //I didn't use final occp and final occn here(maybe I can delete them)
         Final_occn=get_solutions_object(occn);                   //get solution object, density.h
         Final_occp=get_solutions_object(occp);
         /* Form the densities */
         generate_density(occn,occp,dens,denv,denp,den3); //calculate all the density based on the occupied states, density.h
-
 //  soft update the density 
 //        if(ite > 0){
 //            for(int i = 0; i < max_L; i++){
@@ -186,15 +166,16 @@ int main(int argc, char ** argv){
 //                     denp[i][j] = 3./4 * denp_old[i][j] + 1.0/4 * denp[i][j];
 //                 }
 //             }
-//         }
-        
+//         }    
 //        dens_old = dens;
 //        denv_old = denv;
 //        den3_old = den3;
 //        denp_old = denp;
         
-        for(int i = 0; i < max_L; i++)
+        //output the density
+        for(int i = 0; i < max_L; i++) {
             cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+        }
         
         /* find the minimum */
         int min_index = -1;
@@ -210,21 +191,18 @@ int main(int argc, char ** argv){
         
         /* compute the effective density solve the klein-gordon equation update the potentials*/
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
-        for(int i = 0; i < max_L; i++)
+        for(int i = 0; i < max_L; i++) {
             cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
+        }
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
-        cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
+        // cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
         oldmin = min_dens;
         
-
-
-
-        
-        /*get energy*/
+        /*get energy and radius*/
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         if (abs(allEnergies[ite]) > 1500) break;
-        cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
+        // cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"E/A="<< bindingPerParticle <<endl;
         radius = computeRadius(denv, denp);
@@ -234,7 +212,6 @@ int main(int argc, char ** argv){
         cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
     } //end the iterations
     
-
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
     string flag = "n";
@@ -300,7 +277,7 @@ int main(int argc, char ** argv){
     //output neutron skin
     ofstream testoutputfile;
     testoutputfile.open("output/" + outputfileName + "radius.txt", std::ios_base::app);
-  	testoutputfile << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
+  	testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
   	return 0;
 }
 
