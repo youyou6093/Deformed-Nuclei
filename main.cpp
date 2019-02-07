@@ -218,6 +218,26 @@ int main(int argc, char ** argv){
     } //end the iterations
     
 
+
+    for (int i = 0; i < Final_occp.size(); i++) {
+        ofstream coefficients_file;
+        coefficients_file.open("output/coefficients/occp " + to_string(i) + ".txt");
+        for (int j = 0; j < Final_occp[i].my_pair.size(); j++) {
+            coefficients_file << Final_occp[i].my_pair[j].coefs << " " << Final_occp[i].my_pair[j].state << endl; 
+        }
+        coefficients_file.close();
+    }
+
+    for (int i = 0; i < Final_occn.size(); i++) {
+        ofstream coefficients_file;
+        coefficients_file.open("output/coefficients/occn " + to_string(i) + ".txt");
+        for (int j = 0; j < Final_occn[i].my_pair.size(); j++) {
+            coefficients_file << Final_occn[i].my_pair[j].coefs << " " << Final_occn[i].my_pair[j].state << endl; 
+        }
+        coefficients_file.close();
+    }
+
+
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
     // string flag;
