@@ -74,7 +74,7 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "parameters/" + parameterName + ".txt"; 
+    parameters = "family/" + parameterName + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
