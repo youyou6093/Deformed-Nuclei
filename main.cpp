@@ -242,7 +242,7 @@ int main(int argc, char ** argv){
     // cout << "output all potentials and densities? choose y/n" << endl;
     // string flag;
     // cin >> flag;
-    string flag = "n";
+    string flag = "y";
     if (flag == "y") {
     	for(int i = 0 ;i < max_L; i++){
         	ofstream outfile;
