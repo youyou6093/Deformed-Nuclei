@@ -74,7 +74,7 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "family/" + parameterName + ".txt"; 
+    parameters = "parameters/" + parameterName + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
@@ -214,7 +214,7 @@ int main(int argc, char ** argv){
     
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
-    string flag = "n";
+    string flag = "y";
     // cin >> flag;
     if (flag == "y") {
     	for(int i = 0 ;i < max_L; i++){
