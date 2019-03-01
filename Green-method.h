@@ -20,13 +20,14 @@ double klein2(double mass, vector<double> &density, int index, int L, my_spline 
     double coef = 1/(mass*r);
     double coef1,coef2;
     vector<double> inte1, inte2, fx1, fx2;
-    coef1 = riccatihI(L, r * mass);
+    coef1 = riccatihI(L, r * mass);          //h_hat(imr)
     if(r * mass < 1){
-        coef2 = riccatijIs.eval(r*mass);
+        coef2 = riccatijIs.eval(r*mass);     //j_hat(imr)
     }
     else{
         coef2 = riccatijI(L, r*mass);
     }
+    //left region (from 0 to r)
     for(int i = 0; i < index + 1;i ++){  //left half
         if((L % 2) == 0)   //need an extra minus because the even channels are imaginary
             inte1.push_back(-JIs[type][i]*coef1*fx[i]*density[i]); //the left integral
@@ -34,6 +35,7 @@ double klein2(double mass, vector<double> &density, int index, int L, my_spline 
             inte1.push_back(JIs[type][i]*coef1*fx[i]*density[i]);
         fx1.push_back(fx[i]);
     }
+    //right region (from r to infinity)
     for(int i = index; i < N; i++){
         if((L % 2) == 0)
             inte2.push_back(-coef2*HIs[type][i]*fx[i]*density[i]);
@@ -41,12 +43,15 @@ double klein2(double mass, vector<double> &density, int index, int L, my_spline 
             inte2.push_back(coef2*HIs[type][i]*fx[i]*density[i]);
         fx2.push_back(fx[i]);
     }
+
+    //left part only have 2 points(1 won't happen because we alwasy start from the second point)
     if(fx1.size()==2){
         double manual_spline_y = 0.5*(inte1[0] + inte1[1]);
         double manual_spline_x = 0.5*(fx1[0] + fx1[1]);
         fx1.insert(fx1.begin()+1, manual_spline_x);
         inte1.insert(inte1.begin()+1, manual_spline_y);
     }
+    //right part only have 2 points
     if(fx2.size()==2){
         double manual_spline_y = 0.5*(inte2[0]+inte2[1]);
         double manual_spline_x = 0.5*(fx2[0]+fx2[1]);
@@ -54,6 +59,7 @@ double klein2(double mass, vector<double> &density, int index, int L, my_spline 
         inte2.insert(inte2.begin()+1,manual_spline_y);
     }
 
+    //if right part only have 1 points, only integrate left part
     if(fx2.size() == 1){
         return coef*my_spline(inte1,fx1,my_tolerance).integral();
     }
