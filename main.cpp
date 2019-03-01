@@ -28,7 +28,7 @@ using namespace std;
 const double PI=atan(1.0)*4;
 //string parameters = "/Users/junjieyang/Dropbox/project/Deform_c_new/parameter.txt";  // the file contains the model parameters
 string parameters = "parameter.txt";
-double my_tolerance=1e-3;   //tolerance of the integrator
+double my_tolerance=1e-4;   //tolerance of the integrator
 /*model parameters, default values are linear*/
 double hbarc=197.326;
 double ms=520.0/hbarc;
