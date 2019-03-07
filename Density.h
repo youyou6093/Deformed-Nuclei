@@ -63,6 +63,7 @@ class Density{
 public:
     vector<Solution> solution;
     vector<den> density;
+    vector<double> so = vector<double>(N, 0.0);
     
     
     Density(vector<eig2> & occ){
@@ -133,6 +134,30 @@ public:
     void Compute_all(){
         for(int i=0;i<solution.size();i++){
             compute(i);
+        }
+    }
+
+//--------------------------------------------------------------newly spin orbit term, seems correct, need further check
+
+
+    void compute_so(int num) {
+        Solution x = solution[num];
+        //loop through all kappas
+        for (int i = 0; i < x.kappas.size(); i++) {
+            //loop through all locations 
+            for (int j = 1; j < N; j++) {
+                //so is then density evaluate at this point
+                so[j] += 2 * x.wavefunctions[i].upper[j] * x.wavefunctions[i].lower[j] / (fx[j] * fx[j]);
+            }
+            so[0] = so[1];  //matches the component 
+         }   
+    }
+
+    //gnk and fnk, only compute the 0 component of the density
+    void spin_orbit_density() {
+        for (int i = 0; i < solution.size(); i++) {
+            //loop over all occupied states
+            compute_so(i);
         }
     }
 };

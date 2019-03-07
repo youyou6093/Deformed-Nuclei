@@ -265,6 +265,28 @@ int main(int argc, char ** argv){
          << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
     }
     energyfile.close();
+
+
+
+    /*output the spin orbit term*/
+    //proton, neutron
+    Density all_states_p(occp), all_states_n(occn);
+    all_states_p.spin_orbit_density();       //compute the spin-orbit for proton and neutron
+    all_states_n.spin_orbit_density();
+    ofstream so_term;
+    so_term.open("output/spin-orbit.txt");
+    for (int i = 0; i < N; i++) {
+        so_term << fx[i] << " " << all_states_p.so[i] << " " << all_states_n.so[i] << endl;
+    }
+    so_term.close();
+
+
+
+
+
+
+
+
     //--------------------------------------------------------
     /* get time */
     chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
