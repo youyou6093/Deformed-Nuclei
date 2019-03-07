@@ -177,7 +177,9 @@ int main(int argc, char ** argv){
 //        denv_old = denv;
 //        den3_old = den3;
 //        denp_old = denp;
-        
+
+       
+ 
         for(int i = 0; i < max_L; i++)
             cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
         
@@ -195,6 +197,29 @@ int main(int argc, char ** argv){
         
         /* compute the effective density solve the klein-gordon equation update the potentials*/
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
+
+
+
+        /*debugging purpose update current potential and density so I can check the klein gordon equation calculation*/
+        for(int i = 0 ;i < max_L; i++){
+            ofstream outfile;
+            ofstream outfile2;
+            outfile.open("cur_density" + to_string(i) + ".txt");
+            outfile2.open("cur_potential" + to_string(i) + ".txt");
+            for(int j = 0; j < N; j++){
+                outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+                outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+            }
+            outfile.close();
+            outfile2.close();
+        }
+
+
+
+
+
+
+
         for(int i = 0; i < max_L; i++)
             cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
         /*check how many occ states we found for each iteration*/
