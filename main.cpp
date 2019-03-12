@@ -74,7 +74,7 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "parameters/" + parameterName + ".txt"; 
+    parameters = "family/" + parameterName + ".txt"; 
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
@@ -82,6 +82,15 @@ int main(int argc, char ** argv){
     neutron_number = atoi(argv[3]);
     outputfileName = argv[4];
     max_k = atoi(argv[5]);
+    string nuclei_name = "";
+    for (int i = 0; i < outputfileName.size(); i++) {
+    	if (outputfileName[i] == ' ') {
+    		for (int j = i + 1; j < outputfileName.size(); j++) {
+    			nuclei_name += outputfileName[j];
+    		}
+    		break; 
+    	}
+    }
     //print the arguments just in case
     cout << "other arguments " << proton_number << ' ' << neutron_number << ' ' << outputfileName << ' ' 
          << max_k << endl; 
@@ -214,7 +223,7 @@ int main(int argc, char ** argv){
     
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
-    string flag = "y";
+    string flag = "n";
     // cin >> flag;
     if (flag == "y") {
     	for(int i = 0 ;i < max_L; i++){
@@ -274,13 +283,18 @@ int main(int argc, char ** argv){
     all_states_p.spin_orbit_density();       //compute the spin-orbit for proton and neutron
     all_states_n.spin_orbit_density();
     ofstream so_term;
-    so_term.open("output/spin-orbit.txt");
+    so_term.open("output/so_density/" + parameterName +  nuclei_name + "spin-orbit.txt");
     for (int i = 0; i < N; i++) {
         so_term << fx[i] << " " << all_states_p.so[i] << " " << all_states_n.so[i] << endl;
     }
     so_term.close();
 
-
+    ofstream outfile;
+    outfile.open("output/so_density/" + parameterName +  nuclei_name + "density.txt");
+    for(int j = 0; j < N; j++){
+        outfile << fx[j] << ' ' << dens[0][j] << ' ' << denv[0][j] << ' ' << den3[0][j] << ' ' << denp[0][j] << endl;
+    }
+    outfile.close();
 
 
 

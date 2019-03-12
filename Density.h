@@ -147,7 +147,7 @@ public:
             //loop through all locations 
             for (int j = 1; j < N; j++) {
                 //so is then density evaluate at this point
-                so[j] += 2 * x.wavefunctions[i].upper[j] * x.wavefunctions[i].lower[j] / (fx[j] * fx[j]);
+                so[j] += (1 / 4.0 / PI) * 2 * x.wavefunctions[i].upper[j] * x.wavefunctions[i].lower[j] / (fx[j] * fx[j]);
             }
             so[0] = so[1];  //matches the component 
          }   
