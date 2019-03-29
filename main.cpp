@@ -70,30 +70,32 @@ int nodes;
 int main(int argc, char ** argv){
     //Input part and the parameters
     //the arguments contains : parameter number, proton number, neutron number, outputfilename
-    string parameterName = argv[1];
-    string outputfileName;
-    cout << "arguments is " << parameterName  << endl;
+    // string parameterName = argv[1];
+    // string outputfileName;
+    // cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "family/" + parameterName + ".txt"; 
+    // parameters = "family/" + parameterName + ".txt";
+    parameters = argv[1]; 
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
-    proton_number = atoi(argv[2]);
-    neutron_number = atoi(argv[3]);
-    outputfileName = argv[4];
-    max_k = atoi(argv[5]);
-    string nuclei_name = "";
-    for (int i = 0; i < outputfileName.size(); i++) {
-    	if (outputfileName[i] == ' ') {
-    		for (int j = i + 1; j < outputfileName.size(); j++) {
-    			nuclei_name += outputfileName[j];
-    		}
-    		break; 
-    	}
-    }
+    // proton_number = atoi(argv[2]);
+    // neutron_number = atoi(argv[3]);
+    // outputfileName = argv[4];
+    // max_k = atoi(argv[5]);
+    max_k = 5
+    // string nuclei_name = "";
+    // for (int i = 0; i < outputfileName.size(); i++) {
+    // 	if (outputfileName[i] == ' ') {
+    // 		for (int j = i + 1; j < outputfileName.size(); j++) {
+    // 			nuclei_name += outputfileName[j];
+    // 		}
+    // 		break; 
+    // 	}
+    // }
     //print the arguments just in case
-    cout << "other arguments " << proton_number << ' ' << neutron_number << ' ' << outputfileName << ' ' 
-         << max_k << endl; 
+    // cout << "other arguments " << proton_number << ' ' << neutron_number << ' ' << outputfileName << ' ' 
+         // << max_k << endl; 
     //define the variables
     double oldmin = 0.0;      //the min of the L = 1 density channel
     chrono::steady_clock::time_point tp1 = chrono::steady_clock::now();  //current time
@@ -120,7 +122,7 @@ int main(int argc, char ** argv){
     /*Determine the range of m, just roughly determine*/
     int min_m = -magic(max(proton_number,neutron_number));
     int max_m = -min_m;
-    cout << "M range is: " << min_m << " -> " << max_m << endl;
+    // cout << "M range is: " << min_m << " -> " << max_m << endl;
     vector<Solution> Final_occp,Final_occn;                 //Final solution for every iteration
     //The self consistent calculations
     for(int ite=0;ite<itenum;ite++){
@@ -182,9 +184,9 @@ int main(int argc, char ** argv){
 //        denp_old = denp;
         
         //output the density
-        for(int i = 0; i < max_L; i++) {
-            cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
-        }
+        // for(int i = 0; i < max_L; i++) {
+        //     cout << "Channel=" << i << ':' << dens[i][0] << ' ' << denv[i][0] << ' ' << den3[i][0] << ' ' << denp[i][0] << endl;
+        // }
         
         /* find the minimum */
         int min_index = -1;
@@ -200,11 +202,11 @@ int main(int argc, char ** argv){
         
         /* compute the effective density solve the klein-gordon equation update the potentials*/
         update_potential(EFF_Phi, EFF_B, EFF_A, EFF_W, Phi, W, B, A, dens, denv, den3, denp);
-        for(int i = 0; i < max_L; i++) {
-            cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
-        }
+        // for(int i = 0; i < max_L; i++) {
+        //     cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
+        // }
         /*check how many occ states we found for each iteration*/
-        cout<<occp.size()<<' '<<occn.size()<<endl;
+        // cout<<occp.size()<<' '<<occn.size()<<endl;
         // cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
         oldmin = min_dens;
         
@@ -213,88 +215,88 @@ int main(int argc, char ** argv){
         if (abs(allEnergies[ite]) > 1500) break;
         // cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
-        cout<<"E/A="<< bindingPerParticle <<endl;
+        // cout<<"E/A="<< bindingPerParticle <<endl;
         radius = computeRadius(denv, denp);
-        cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
+        // cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
-        cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
+        // cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
     } //end the iterations
     
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
-    string flag = "n";
-    // cin >> flag;
-    if (flag == "y") {
-    	for(int i = 0 ;i < max_L; i++){
-        	ofstream outfile;
-        	ofstream outfile2;
-        	outfile.open("density" + to_string(i) + ".txt");
-        	outfile2.open("potential" + to_string(i) + ".txt");
-        	for(int j = 0; j < N; j++){
-            	outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
-            	outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
-        	}
-        	outfile.close();
-        	outfile2.close();
-    	}
-    } 
+    // string flag = "n";
+    // // cin >> flag;
+    // if (flag == "y") {
+    // 	for(int i = 0 ;i < max_L; i++){
+    //     	ofstream outfile;
+    //     	ofstream outfile2;
+    //     	outfile.open("density" + to_string(i) + ".txt");
+    //     	outfile2.open("potential" + to_string(i) + ".txt");
+    //     	for(int j = 0; j < N; j++){
+    //         	outfile << fx[j] << ' ' << dens[i][j] << ' ' << denv[i][j] << ' ' << den3[i][j] << ' ' << denp[i][j] << endl;
+    //         	outfile2 << fx[j] << ' ' << Phi[i][j] << ' ' << W[i][j] << ' ' << B[i][j] << ' ' << A[i][j] << endl;
+    //     	}
+    //     	outfile.close();
+    //     	outfile2.close();
+    // 	}
+    // } 
     
-    //output the L = 1 channel of density
-    if(max_L > 1){
-        ofstream outfile;
-        outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
-        for(int j = 0; j < N; j++){
-            outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
-        }
-    }
+    // //output the L = 1 channel of density
+    // if(max_L > 1){
+    //     ofstream outfile;
+    //     outfile.open("output/density" + to_string(Deformation_parameter) + ".txt");
+    //     for(int j = 0; j < N; j++){
+    //         outfile << fx[j] << ' ' << dens[1][j] << ' ' << denv[1][j] << ' ' << den3[1][j] << ' ' << denp[1][j] << endl;
+    //     }
+    // }
     
-    //output the energies over iterations
-    ofstream energyfile;
-    energyfile.open("output/totalenergies" + to_string(Deformation_parameter) + ".txt");
-    for (int i = 0; i < itenum; i++) {
-        energyfile << setprecision(9) << allEnergies[i] << endl;
-    }
-    energyfile.close();
+    // //output the energies over iterations
+    // ofstream energyfile;
+    // energyfile.open("output/totalenergies" + to_string(Deformation_parameter) + ".txt");
+    // for (int i = 0; i < itenum; i++) {
+    //     energyfile << setprecision(9) << allEnergies[i] << endl;
+    // }
+    // energyfile.close();
     
-    /* output the single state energy*/
-    energyfile.open("output/singleStateEnergy" + to_string(Deformation_parameter) + ".txt");
-    for(int i = 0; i < occp.size(); i ++){
-        eig2 test = occp[i];
-        Solution temp = Solution(test);
-        temp.get_primary_state();
-        energyfile << i << setprecision(9) << " energy for occp = " << temp.energy <<
-             ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-    }
-    for(int i = 0; i < occn.size(); i ++){
-        eig2 test = occn[i];
-        Solution temp = Solution(test);
-        temp.get_primary_state();
-        energyfile << i << setprecision(9) << " energy for occn = " << temp.energy << ' '
-         << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
-    }
-    energyfile.close();
+    // /* output the single state energy*/
+    // energyfile.open("output/singleStateEnergy" + to_string(Deformation_parameter) + ".txt");
+    // for(int i = 0; i < occp.size(); i ++){
+    //     eig2 test = occp[i];
+    //     Solution temp = Solution(test);
+    //     temp.get_primary_state();
+    //     energyfile << i << setprecision(9) << " energy for occp = " << temp.energy <<
+    //          ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+    // }
+    // for(int i = 0; i < occn.size(); i ++){
+    //     eig2 test = occn[i];
+    //     Solution temp = Solution(test);
+    //     temp.get_primary_state();
+    //     energyfile << i << setprecision(9) << " energy for occn = " << temp.energy << ' '
+    //      << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
+    // }
+    // energyfile.close();
 
 
 
     /*output the spin orbit term*/
     //proton, neutron
-    Density all_states_p(occp), all_states_n(occn);
-    all_states_p.spin_orbit_density();       //compute the spin-orbit for proton and neutron
-    all_states_n.spin_orbit_density();
-    ofstream so_term;
-    so_term.open("output/so_density/" + parameterName +  nuclei_name + "spin-orbit.txt");
-    for (int i = 0; i < N; i++) {
-        so_term << fx[i] << " " << all_states_p.so[i] << " " << all_states_n.so[i] << endl;
-    }
-    so_term.close();
+    // Density all_states_p(occp), all_states_n(occn);
+    // all_states_p.spin_orbit_density();       //compute the spin-orbit for proton and neutron
+    // all_states_n.spin_orbit_density();
+    // ofstream so_term;
+    // so_term.open("output/so_density/" + parameterName +  nuclei_name + "spin-orbit.txt");
+    // for (int i = 0; i < N; i++) {
+    //     so_term << fx[i] << " " << all_states_p.so[i] << " " << all_states_n.so[i] << endl;
+    // }
+    // so_term.close();
 
-    ofstream outfile;
-    outfile.open("output/so_density/" + parameterName +  nuclei_name + "density.txt");
-    for(int j = 0; j < N; j++){
-        outfile << fx[j] << ' ' << dens[0][j] << ' ' << denv[0][j] << ' ' << den3[0][j] << ' ' << denp[0][j] << endl;
-    }
-    outfile.close();
+    // ofstream outfile;
+    // outfile.open("output/so_density/" + parameterName +  nuclei_name + "density.txt");
+    // for(int j = 0; j < N; j++){
+    //     outfile << fx[j] << ' ' << dens[0][j] << ' ' << denv[0][j] << ' ' << den3[0][j] << ' ' << denp[0][j] << endl;
+    // }
+    // outfile.close();
 
 
 
@@ -303,17 +305,17 @@ int main(int argc, char ** argv){
 
     //--------------------------------------------------------
     /* get time */
-    chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
-    chrono::steady_clock::duration d = tp2-tp1;
-    cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
-    cout <<"maxL = "<<max_L<< endl;
-    cout <<"Deformation parameter = "<< Deformation_parameter << endl;
+    // chrono::steady_clock::time_point tp2 = chrono::steady_clock::now();
+    // chrono::steady_clock::duration d = tp2-tp1;
+    // cout <<"Total time used:"<<chrono::duration_cast<chrono::seconds>(d).count()<<endl;
+    // cout <<"maxL = "<<max_L<< endl;
+    // cout <<"Deformation parameter = "<< Deformation_parameter << endl;
 
-
+    cout << radius[0] << " " << radius[1] << " " << radius[2] << endl;
     //output neutron skin
-    ofstream testoutputfile;
-    testoutputfile.open("output/" + outputfileName + "radius.txt", std::ios_base::app);
-  	testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
+    // ofstream testoutputfile;
+    // testoutputfile.open("output/" + outputfileName + "radius.txt", std::ios_base::app);
+  	// testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
   	return 0;
 }
 
