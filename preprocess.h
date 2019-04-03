@@ -43,18 +43,18 @@ void preprocessing(){
 
     parameter_file >> Potential_channel;
     /*--------------------------------------------- */
-    cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
-    cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
-    cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl;
-    cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
-    cout << "channels = " << max_L << endl;
-    cout << "Max kappa = " << max_k << endl;
-    cout << "Number of nodes = " << nodes << endl;
-    cout << "Run " << itenum << " iterations" << endl;
-    cout << "Dipole Parameter = " << Deformation_parameter << endl;
-    cout << "The range of the wave function is " << rmax << endl;
-    cout << "Number of points for every wave_function" << endl;
-    cout << "The extra potential channel is " << Potential_channel << endl;
+    // cout << ms << ' ' << mv << ' ' << mp << ' ' << mg << endl;
+    // cout << gs << ' ' << gv << ' ' << gp << ' ' << gg << endl;
+    // cout<< lambdas << ' ' << lambdav << ' ' << lambda << ' ' << ks << ' ' << ka << endl;
+    // cout << "Z = " << proton_number << " " << "N = " << neutron_number << endl;
+    // cout << "channels = " << max_L << endl;
+    // cout << "Max kappa = " << max_k << endl;
+    // cout << "Number of nodes = " << nodes << endl;
+    // cout << "Run " << itenum << " iterations" << endl;
+    // cout << "Dipole Parameter = " << Deformation_parameter << endl;
+    // cout << "The range of the wave function is " << rmax << endl;
+    // cout << "Number of points for every wave_function" << endl;
+    // cout << "The extra potential channel is " << Potential_channel << endl;
     ms /= hbarc;
     mv /= hbarc;
     mp /= hbarc;

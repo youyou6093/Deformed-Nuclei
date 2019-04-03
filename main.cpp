@@ -79,11 +79,13 @@ int main(int argc, char ** argv){
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
-    // proton_number = atoi(argv[2]);
-    // neutron_number = atoi(argv[3]);
+    proton_number = atoi(argv[2]);
+    neutron_number = atoi(argv[3]);
     // outputfileName = argv[4];
     // max_k = atoi(argv[5]);
-    max_k = 5
+    max_k = 5;
+    // proton_number = argv[2];
+    // neutron_number = argv[3];
     // string nuclei_name = "";
     // for (int i = 0; i < outputfileName.size(); i++) {
     // 	if (outputfileName[i] == ' ') {
@@ -259,23 +261,24 @@ int main(int argc, char ** argv){
     // }
     // energyfile.close();
     
-    // /* output the single state energy*/
-    // energyfile.open("output/singleStateEnergy" + to_string(Deformation_parameter) + ".txt");
-    // for(int i = 0; i < occp.size(); i ++){
-    //     eig2 test = occp[i];
-    //     Solution temp = Solution(test);
-    //     temp.get_primary_state();
-    //     energyfile << i << setprecision(9) << " energy for occp = " << temp.energy <<
-    //          ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
-    // }
-    // for(int i = 0; i < occn.size(); i ++){
-    //     eig2 test = occn[i];
-    //     Solution temp = Solution(test);
-    //     temp.get_primary_state();
-    //     energyfile << i << setprecision(9) << " energy for occn = " << temp.energy << ' '
-    //      << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
-    // }
-    // energyfile.close();
+    /* output the single state energy*/
+    ofstream energyfile;
+    energyfile.open("output/singleStateEnergy" + to_string(Deformation_parameter) + ".txt");
+    for(int i = 0; i < occp.size(); i ++){
+        eig2 test = occp[i];
+        Solution temp = Solution(test);
+        temp.get_primary_state();
+        energyfile << i << setprecision(9) << " energy for occp = " << temp.energy <<
+             ' ' << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;
+    }
+    for(int i = 0; i < occn.size(); i ++){
+        eig2 test = occn[i];
+        Solution temp = Solution(test);
+        temp.get_primary_state();
+        energyfile << i << setprecision(9) << " energy for occn = " << temp.energy << ' '
+         << "m = " << temp.m << " primary_state = (n, k, m, sign)" << temp.primary_state << endl;        
+    }
+    energyfile.close();
 
 
 
@@ -318,6 +321,56 @@ int main(int argc, char ** argv){
   	// testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
   	return 0;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 /* output wavefunctions */
