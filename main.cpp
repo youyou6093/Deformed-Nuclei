@@ -74,7 +74,8 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "family/" + parameterName + ".txt"; 
+    // parameters = "refined/" + parameterName + ".txt"; 
+    parameters = "parameters/" + parameterName + ".txt";
     preprocessing();                    //Prepare the states HashMap
     itenum = 100;
     //update the proton number and neutron number as well as the output file name
@@ -210,7 +211,7 @@ int main(int argc, char ** argv){
         
         /*get energy and radius*/
         allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
-        if (abs(allEnergies[ite]) > 1500) break;
+        if (abs(allEnergies[ite]) > 2500) break;
         // cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
         bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"E/A="<< bindingPerParticle <<endl;
@@ -223,7 +224,7 @@ int main(int argc, char ** argv){
     
     /* option part, output all the potentials and densities */
     // cout << "output all potentials and densities? choose y/n" << endl;
-    string flag = "n";
+    string flag = "y";
     // cin >> flag;
     if (flag == "y") {
     	for(int i = 0 ;i < max_L; i++){
