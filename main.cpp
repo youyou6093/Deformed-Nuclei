@@ -16,7 +16,7 @@
 #include "Solution.h"
 #include "Density.h"
 #include "Green-method.h"
-#include "effective_density.h"
+
 #include "utility.h"
 #include "computeEnergy.h"
 #include <algorithm>
@@ -47,6 +47,7 @@ double ka=0.0/hbarc;
 
 
 /* Computation constants */
+double update_ratio = 1.0 / 5;    //this is a parameter that can be adjusted
 double b=2.4,rmin=0.0,rmax=20.0;
 int N=801;
 int max_L = 1;   /*Max value of L CHANNEL*/   
@@ -64,6 +65,7 @@ int itenum;
 int nodes;
 /*---------------------------------finishing global varialbes-------------------------------------*/
 #include "preprocess.h"
+#include "effective_density.h"
 
 
 /*body of the function*/
@@ -77,7 +79,7 @@ int main(int argc, char ** argv){
     // parameters = "refined/" + parameterName + ".txt"; 
     parameters = "parameters/" + parameterName + ".txt";
     preprocessing();                    //Prepare the states HashMap
-    itenum = 100;
+    itenum = 70;
     //update the proton number and neutron number as well as the output file name
     proton_number = atoi(argv[2]);
     neutron_number = atoi(argv[3]);

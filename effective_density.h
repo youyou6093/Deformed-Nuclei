@@ -147,14 +147,15 @@ void get_potential(vector<vector<double>> &EFF_Phi,vector<vector<double>>  &EFF_
     Get_bessels(0, riccatijIs, JIs, HIs, L);
     Get_bessels(1, riccatijIs, JIs, HIs, L);
     Get_bessels(2, riccatijIs, JIs, HIs, L);
+    double keep_ratio = 1 - update_ratio;
     
 #pragma omp parallel for
     
     
     for(int i=1;i<N;i++){
-         Phi[L][i] = 4 * Phi[L][i]/5.0 + hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0) / 5.0; //not sure whether I can just put gs outside
-         W[L][i] = 4 * W[L][i]/5.0 + hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1) / 5.0;
-         B[L][i] = 4 * B[L][i]/5.0 + hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2) / 5.0;
+         Phi[L][i] = keep_ratio * Phi[L][i] + update_ratio * hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
+         W[L][i] = keep_ratio * W[L][i] + update_ratio * hbarc * gv * klein2(mv, EFF_W[L], i, L, riccatijIs, JIs, HIs,1);
+         B[L][i] = keep_ratio * B[L][i] + update_ratio * hbarc * gp * klein2(mp , EFF_B[L], i, L, riccatijIs, JIs, HIs,2);
          A[L][i] = hbarc * gg * poisson(denp[L], i, L);
         // here gs, gv, gp, gg are all squared
          // Phi[L][i] =  hbarc * gs * klein2(ms,  EFF_Phi[L] , i, L, riccatijIs, JIs, HIs,0); //not sure whether I can just put gs outside
