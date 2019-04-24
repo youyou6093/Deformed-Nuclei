@@ -218,7 +218,8 @@ int main(int argc, char ** argv){
         bindingPerParticle =  compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
         cout<<"E/A="<< bindingPerParticle <<endl;
         radius = computeRadius(denv, denp);
-        cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
+        double rc = sqrt(radius[0] * radius[0] + 0.88 * 0.88 - neutron_number * 0.116 / proton_number);
+        cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << " rc = " << rc << endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
         chrono::steady_clock::duration duration_in_ites = tpnew - tpold;
         cout << "Time_used_in_iteration " <<  ite << " = " <<  chrono::duration_cast<chrono::seconds>(duration_in_ites).count() << endl;
@@ -316,7 +317,8 @@ int main(int argc, char ** argv){
     //output neutron skin
     ofstream testoutputfile;
     testoutputfile.open("output/" + outputfileName + "radius.txt", std::ios_base::app);
-  	testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << endl; 
+    double rc = sqrt(radius[0] * radius[0] + 0.88 * 0.88 - neutron_number * 0.116 / proton_number);
+  	testoutputfile << parameterName << ' ' <<  proton_number << ' ' << neutron_number << ' ' << bindingPerParticle << ' ' << radius[0] << ' ' << radius[1] << ' ' << radius[2] << ' ' << rc << endl; 
   	return 0;
 }
 
