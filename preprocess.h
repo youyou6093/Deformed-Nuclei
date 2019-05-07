@@ -132,7 +132,7 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
     if (L < max_L){
         if(particle_type == 0){
             for(int i=0;i<N;i++){
-               vector_p[L][i] -= Potential[i];
+               vector_p[L][i] += Potential[i];
             }
         }
         else{

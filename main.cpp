@@ -76,8 +76,8 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "parameters/" + parameterName + ".txt"; 
-    // parameters = "parameters/" + parameterName + ".txt";
+    // parameters = "refined/" + parameterName + ".txt"; 
+    parameters = "parameters/" + parameterName + ".txt";
     preprocessing();                    //Prepare the states HashMap
     itenum = 69;
     //update the proton number and neutron number as well as the output file name
@@ -136,7 +136,8 @@ int main(int argc, char ** argv){
         occp.clear();
         occn.clear();
         //because this the added dipole operator contains lambda * tauz *  r * Y10
-        for(int i=0; i<N; i++)    Potential[i] = 0.5 * fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        // for(int i=0; i<N; i++)    Potential[i] = 0.5 * fx[i] * Deformation_parameter * sqrt(3.0 / 4 / PI);
+        for(int i=0; i<N; i++)    Potential[i] = fx[i] * fx[i] * Deformation_parameter;
         /*Every iteration it updates the meson potentials,so it need to recompute the scalar and vector potentials
           those two functions are in preprocess.h
           compute the scalar and vector potential based on the meson fields
