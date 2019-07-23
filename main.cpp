@@ -76,7 +76,7 @@ int main(int argc, char ** argv){
     string outputfileName;
     cout << "arguments is " << parameterName  << endl;
     //set the parameter name
-    parameters = "parameters/" + parameterName + ".txt"; 
+    parameters = "family/" + parameterName + ".txt"; 
     // parameters = "parameters/" + parameterName + ".txt";
     preprocessing();                    //Prepare the states HashMap
     itenum = 69;

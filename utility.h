@@ -10,6 +10,9 @@
 #define utility_h
 #include "integrator.h"
 #include <algorithm>
+#include <unordered_map>
+#include <string>
+#include <iostream>
 using namespace std;
 
 extern int proton_number;
@@ -103,6 +106,14 @@ int magic(int n){
     return 2 * abs(min) - 1;
 }
 
+vector<string> generate_energy_level_map(){
+    return {
+        "0.-1", "0.-2", "0.1", "0.-3", "0.2", "1.-1", "0.-4", 
+        "0.3", "1.-2", "1.1", "0.-5", "0.4", "1.-3", "1.2", 
+        "2.-1", "0.-6"
+    };
+}
+
 
 /*flat a matrix into an vector*/
 vector<double> flat_matrix(vector<vector<double>> &M){
@@ -116,7 +127,34 @@ vector<double> flat_matrix(vector<vector<double>> &M){
 }
 
 
-
+//map state 
+unordered_map<string, vector<eig2>> generate_state_map(vector<eig2> &occ){
+    unordered_map<string, vector<eig2>> ret;
+    auto occ_object = get_solutions_object(occ);
+    for (int i = 0; i < occ_object.size(); i++) {
+        occ_object[i].get_primary_state();
+        string key = to_string(occ_object[i].primary_state.n) + 
+            "." + to_string(occ_object[i].primary_state.k); 
+        if (!ret.count(key)) {
+            vector<eig2> temp;
+            temp.push_back(occ[i]);
+            ret[key] = temp;
+        } else {
+            ret[key].push_back(occ[i]);
+        }
+     }
+    // test
+    // for (auto& item : ret) {
+    //     cout << item.first << endl;
+    //     auto temp = get_solutions_object(item.second);
+    //     for (auto& state : temp) {
+    //         state.get_primary_state();
+    //         cout << state.primary_state << ";";
+    //     }
+    //     cout << endl;
+    // }
+    return ret;
+} 
 
 
 /* after we get all the raw solutions, change the solution to MEV and only keep the energies between -939 and 5,
@@ -140,12 +178,22 @@ void get_solution(vector<eig2> &occp_raw,vector<eig2> &occn_raw,vector<eig2> &oc
     sort(occn.begin(),occn.end(),compare_eig2);
     sort(occp.begin(),occp.end(),compare_eig2);
     /*delete some solutions if I already got enough occ states*/
+    if (neutron_number == 78) {
+        vector<eig2> occn_temp;
+        auto map = generate_state_map(occn);
+        auto energy_level = generate_energy_level_map();
+        for (int i = 0; i < energy_level.size(); i ++) {
+            // cout << energy_level[i] << ' ' << map[energy_level[i]].size() << endl;
+            for (auto state : map[energy_level[i]]) {
+                occn_temp.push_back(state);
+            }
+        }
+        occn = occn_temp;
+    }
     if(occn.size()>neutron_number) occn.erase(occn.begin()+neutron_number,occn.end());
     if(occp.size()>proton_number) occp.erase(occp.begin()+proton_number,occp.end());
     
 }
-
-
 
 
 
