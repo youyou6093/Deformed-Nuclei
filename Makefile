@@ -1,5 +1,5 @@
 main: main.o RacahFunctions.o
-	g++ main.o -fopenmp RacahFunctions.o -o main -lgsl -lblas  
+	g++ main.o -fopenmp RacahFunctions.o -o main -lgsl -lgslcblas 
 
 main.o:
 	g++ -c -fopenmp -std=c++11 main.cpp  -O3
