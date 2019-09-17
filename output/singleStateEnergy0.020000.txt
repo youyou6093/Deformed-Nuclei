@@ -1,0 +1,16 @@
+0 energy for occp = -36.7751621 m = 1 primary_state = (n, k, m, sign)0 -1 1 1
+1 energy for occp = -36.7751621 m = -1 primary_state = (n, k, m, sign)0 -1 -1 1
+2 energy for occp = -16.4413436 m = 1 primary_state = (n, k, m, sign)0 -2 1 1
+3 energy for occp = -16.4413436 m = -1 primary_state = (n, k, m, sign)0 -2 -1 1
+4 energy for occp = -16.441343 m = 3 primary_state = (n, k, m, sign)0 -2 3 1
+5 energy for occp = -16.441343 m = -3 primary_state = (n, k, m, sign)0 -2 -3 1
+6 energy for occp = -8.67798848 m = -1 primary_state = (n, k, m, sign)0 1 -1 1
+7 energy for occp = -8.67798848 m = 1 primary_state = (n, k, m, sign)0 1 1 1
+0 energy for occn = -40.9789701 m = -1 primary_state = (n, k, m, sign)0 -1 -1 1
+1 energy for occn = -40.9789701 m = 1 primary_state = (n, k, m, sign)0 -1 1 1
+2 energy for occn = -20.3172957 m = -1 primary_state = (n, k, m, sign)0 -2 -1 1
+3 energy for occn = -20.3172957 m = 1 primary_state = (n, k, m, sign)0 -2 1 1
+4 energy for occn = -20.3172953 m = 3 primary_state = (n, k, m, sign)0 -2 3 1
+5 energy for occn = -20.3172953 m = -3 primary_state = (n, k, m, sign)0 -2 -3 1
+6 energy for occn = -12.4323944 m = 1 primary_state = (n, k, m, sign)0 1 1 1
+7 energy for occn = -12.4323944 m = -1 primary_state = (n, k, m, sign)0 1 -1 1
