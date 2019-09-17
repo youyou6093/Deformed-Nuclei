@@ -9,7 +9,7 @@ extern int proton_number;
 extern int neutron_number;
 extern double hbarc,ms,mv,mp,mg,gs,gv,gp,gg,lambdas,lambdav, lambda, ks,ka;
 
-double compute_energy2(vector<eig2> &occp,vector<eig2> &occn,vector<vector<double>> &Phi,
+pair<double, double> compute_energy2(vector<eig2> &occp,vector<eig2> &occn,vector<vector<double>> &Phi,
                       vector<vector<double>> &W, vector<vector<double>> &B, vector<vector<double>> &A,
                       vector<vector<double>> &dens, vector<vector<double>> &denv, vector<vector<double>> &den3,
                       vector<vector<double>> &denp) {
@@ -36,7 +36,7 @@ double compute_energy2(vector<eig2> &occp,vector<eig2> &occn,vector<vector<doubl
     double ret = bindEnergySum - my_spline(inte, fx, my_tolerance).integral();
     double be = ret / (proton_number + neutron_number) - ecm;
 //    cout << "B/A is " << be << endl;
-    return ret;
+    return make_pair(be, ret);
 }
 
 

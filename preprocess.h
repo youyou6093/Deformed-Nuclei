@@ -126,6 +126,7 @@ void generate_potential(vector<vector<double>> &Phi,vector<vector<double>> &W, v
     }
     // cout << "test" << endl;
 
+    // cout << Potential[200] << endl;
     
     /* USE vector potential*/
     /* put the potential we add to the scalar and vector part, depend on what I want the potential to be*/

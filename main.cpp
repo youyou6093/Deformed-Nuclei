@@ -199,7 +199,7 @@ int main(int argc, char ** argv){
             cout <<"channel="<<i<<':'<< Phi[i][50] <<' '<< W[i][50]<<' '<<B[i][50]<<' '<<A[i][50]<<endl;
         /*check how many occ states we found for each iteration*/
         cout<<occp.size()<<' '<<occn.size()<<endl;
-        cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
+        // cout << "minimum" << ' ' << min_index << ' ' << min_dens << ' ' << min_dens - oldmin << endl;
         oldmin = min_dens;
         
 
@@ -207,9 +207,11 @@ int main(int argc, char ** argv){
 
         
         /*get energy*/
-        allEnergies[ite] = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
-        cout<<"total energy = " << setprecision(9) << allEnergies[ite] << endl;
-        cout<<"E/A="<<compute_energy(occp, occn, Phi, W, B, A, dens, denv, den3, denp)<<endl;
+        pair<double, double> energy_result = compute_energy2(occp, occn, Phi, W, B, A, dens, denv, den3, denp);
+        // acutally it is binding energy per particle that get saved to the array
+        allEnergies[ite] = energy_result.first; 
+        cout<<"total energy = " << setprecision(9) << energy_result.second << endl;
+        cout<<"E/A="<< setprecision(9) << energy_result.first <<endl;
         vector<double> radius = computeRadius(denv, denp);
         cout<<"rp = " << radius[0] << " rn = " << radius[1] << " skin = " << radius[2] << endl;
         chrono::steady_clock::time_point tpnew = chrono::steady_clock::now();
